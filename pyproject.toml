@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "omni"
+version = "0.1.0"
+authors = [
+  { name="Daniel Tiesling", email="daniel.tiesling@camo.ag" },
+]
+description = "Omni Analytics Python SDK."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = []
+
+[tool]
+[tool.hatch.version]
+path = "src/flask_muck/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/omni"]
+
+[tool.poetry]
+name = "omni"
+description = "Omni Analytics Python SDK."
+version = "0.1.0"
+authors = ["Daniel Tiesling <daniel.tiesling@camo.ag>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.10.0"
+pytest = "^8.2.2"
+coverage = "^7.5.3"
+pytest-cov = "^5.0.0"
+
+[tool.mypy]
+packages = "src"
+strict = true
+disallow_untyped_calls = false
+warn_return_any = false
+disallow_any_generics = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test*.py"
+pythonpath = ["src"]
+
+[tool.coverage.run]
+branch = true
