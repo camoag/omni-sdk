@@ -3,14 +3,12 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
-import json
+import urllib.parse
 import uuid
 from dataclasses import dataclass, asdict
 from enum import Enum
-from typing import Literal
-import urllib.parse
 
-from omni.utils import compact_json_dump
+from .utils import compact_json_dump
 
 
 @dataclass
@@ -29,7 +27,7 @@ class DashboardEmbedUrl:
     userAttributes: str | None = None
     signature: str | None = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String representation renders the complete URL for the embedded dashboard."""
         params = asdict(self)
         del params["base_url"]
@@ -74,15 +72,15 @@ class OmniDashboardEmbedder:
 
         # Preprocess some values before passing to URL object.
         if link_access is True:
-            link_access = "__omni_link_access_open"
+            _link_access = "__omni_link_access_open"
         elif isinstance(link_access, list):
-            link_access = ",".join(link_access)
-
-        if custom_theme:
-            custom_theme = compact_json_dump(custom_theme)
-
-        if user_attributes:
-            user_attributes = compact_json_dump(user_attributes)
+            _link_access = ",".join(link_access)
+        elif not link_access:
+            _link_access = None
+        else:
+            raise ValueError(
+                "link_access must be a list of dashboard IDs or True to allow links to all dashboards."
+            )
 
         if isinstance(filter_search_params, dict):
             filter_search_params = urllib.parse.urlencode(
@@ -94,14 +92,16 @@ class OmniDashboardEmbedder:
             contentPath=content_path,
             externalId=external_id,
             name=name,
-            customTheme=custom_theme,
+            customTheme=compact_json_dump(custom_theme) if custom_theme else None,
             entity=entity,
             filterSearchParam=filter_search_params,
-            linkAccess=str(link_access),
+            linkAccess=_link_access,
             prefersDark=prefers_dark.value if prefers_dark else None,
             theme=theme.value if theme else None,
-            userAttributes=user_attributes,
-            nonce=uuid.uuid4().hex(),
+            userAttributes=(
+                compact_json_dump(user_attributes) if user_attributes else None
+            ),
+            nonce=uuid.uuid4().hex,
         )
         self._sign_url(url)
         return str(url)
@@ -121,8 +121,7 @@ class OmniDashboardEmbedder:
             url.theme,
             url.userAttributes,
         ]
-        blob_items = [i for i in blob_items if i is not None]
-        blob = "\n".join(blob_items)
+        blob = "\n".join([i for i in blob_items if i is not None])
         hmac_hash = hmac.new(
             self.embed_secret.encode("utf-8"), blob.encode("utf-8"), hashlib.sha256
         ).digest()
