@@ -6,6 +6,7 @@ import hmac
 import json
 import uuid
 from dataclasses import dataclass, asdict
+from enum import Enum
 from typing import Literal
 import urllib.parse
 
@@ -23,8 +24,8 @@ class DashboardEmbedUrl:
     entity: str | None = None
     filterSearchParam: str | None = None
     linkAccess: str | None = None
-    prefersDark: Literal["system", "true", "false"] | None = None
-    theme: Literal["dawn", "vibes", "breeze", "blank"] | None = None
+    prefersDark: str | None = None
+    theme: str | None = None
     userAttributes: str | None = None
     signature: str | None = None
 
@@ -39,6 +40,17 @@ class DashboardEmbedUrl:
 
 
 class OmniDashboardEmbedder:
+
+    class PrefersDark(Enum):
+        yes = "true"
+        no = "false"
+        system = "system"
+
+    class Theme(Enum):
+        dawn = "dawn"
+        vibes = "vibes"
+        breeze = "breeze"
+        blank = "blank"
 
     def __init__(self, organization_name: str, embed_secret: str):
         self.embed_login_url = (
@@ -55,15 +67,12 @@ class OmniDashboardEmbedder:
         entity: str | None = None,
         filter_search_params: str | dict | None = None,
         link_access: bool | list[str] | None = None,
-        prefers_dark: bool | Literal["system"] | None = None,
-        theme: Literal["dawn", "vibes", "breeze", "blank"] | None = None,
+        prefers_dark: PrefersDark | None = None,
+        theme: Theme | None = None,
         user_attributes: dict | None = None,
     ) -> str:
 
         # Preprocess some values before passing to URL object.
-        if prefers_dark:
-            prefers_dark = str(prefers_dark).lower()
-
         if link_access is True:
             link_access = "__omni_link_access_open"
         elif isinstance(link_access, list):
@@ -88,16 +97,16 @@ class OmniDashboardEmbedder:
             customTheme=custom_theme,
             entity=entity,
             filterSearchParam=filter_search_params,
-            linkAccess=link_access,
-            prefersDark=prefers_dark,
-            theme=theme,
+            linkAccess=str(link_access),
+            prefersDark=prefers_dark.value if prefers_dark else None,
+            theme=theme.value if theme else None,
             userAttributes=user_attributes,
             nonce=uuid.uuid4().hex(),
         )
         self._sign_url(url)
         return str(url)
 
-    def _sign_url(self, url: DashboardEmbedUrl) -> str:
+    def _sign_url(self, url: DashboardEmbedUrl) -> None:
         blob_items = [
             url.base_url,
             url.contentPath,

@@ -28,8 +28,8 @@ class TestEmbed:
             entity="Acme",
             filter_search_params={"state": "GA"},
             link_access=True,
-            prefers_dark=True,
-            theme="dawn",
+            prefers_dark=OmniDashboardEmbedder.PrefersDark.yes,
+            theme=OmniDashboardEmbedder.Theme.dawn,
             user_attributes={"country": "USA"},
         )
         assert url == (
