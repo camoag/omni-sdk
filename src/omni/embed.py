@@ -38,17 +38,27 @@ class DashboardEmbedUrl:
         return f"{self.base_url}?{urllib.parse.urlencode(params)}"
 
 
-class DashboardEmbedUrlFactory:
+class OmniDashboardEmbedder:
 
     def __init__(self, organization_name: str, embed_secret: str):
-        self.embed_login_url = f"https://{organization_name}.embed-omniapp.co/embed/login"
+        self.embed_login_url = (
+            f"https://{organization_name}.embed-omniapp.co/embed/login"
+        )
         self.embed_secret = embed_secret
 
-    def build_url(self, content_path: str, external_id: str, name: str, custom_theme: dict | None = None,
-                  entity: str | None = None, filter_search_params: str | dict | None = None,
-                  link_access: bool | list[str] | None = None, prefers_dark: bool | Literal["system"] | None = None,
-                  theme: Literal["dawn", "vibes", "breeze", "blank"] | None = None,
-                  user_attributes: dict | None = None) -> str:
+    def build_url(
+        self,
+        content_path: str,
+        external_id: str,
+        name: str,
+        custom_theme: dict | None = None,
+        entity: str | None = None,
+        filter_search_params: str | dict | None = None,
+        link_access: bool | list[str] | None = None,
+        prefers_dark: bool | Literal["system"] | None = None,
+        theme: Literal["dawn", "vibes", "breeze", "blank"] | None = None,
+        user_attributes: dict | None = None,
+    ) -> str:
 
         # Preprocess some values before passing to URL object.
         if prefers_dark:
@@ -66,7 +76,9 @@ class DashboardEmbedUrlFactory:
             user_attributes = compact_json_dump(user_attributes)
 
         if isinstance(filter_search_params, dict):
-            filter_search_params = urllib.parse.urlencode(filter_search_params, doseq=True)
+            filter_search_params = urllib.parse.urlencode(
+                filter_search_params, doseq=True
+            )
 
         url = DashboardEmbedUrl(
             base_url=self.embed_login_url,
@@ -80,7 +92,7 @@ class DashboardEmbedUrlFactory:
             prefersDark=prefers_dark,
             theme=theme,
             userAttributes=user_attributes,
-            nonce=uuid.uuid4().hex()
+            nonce=uuid.uuid4().hex(),
         )
         self._sign_url(url)
         return str(url)
@@ -98,9 +110,11 @@ class DashboardEmbedUrlFactory:
             url.linkAccess,
             url.prefersDark,
             url.theme,
-            url.userAttributes
+            url.userAttributes,
         ]
         blob_items = [i for i in blob_items if i is not None]
-        blob = '\n'.join(blob_items)
-        hmac_hash = hmac.new(self.embed_secret.encode('utf-8'), blob.encode('utf-8'), hashlib.sha256).digest()
-        url.signature = base64.urlsafe_b64encode(hmac_hash).decode('utf-8')
+        blob = "\n".join(blob_items)
+        hmac_hash = hmac.new(
+            self.embed_secret.encode("utf-8"), blob.encode("utf-8"), hashlib.sha256
+        ).digest()
+        url.signature = base64.urlsafe_b64encode(hmac_hash).decode("utf-8")
