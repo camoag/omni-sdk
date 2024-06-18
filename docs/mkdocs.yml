@@ -1,0 +1,59 @@
+site_name: Omni SDK
+repo_url: https://github.com/tillable/omni-sdk
+theme:
+  name: material
+#  logo: img/icon.png
+#  favicon: img/favicon.png
+  icon:
+    admonition:
+      example: octicons/code-24
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - toc.follow
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.annotate
+  palette:
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+plugins:
+  - search
+  - mkdocstrings
+markdown_extensions:
+  - attr_list
+  - admonition
+  - abbr
+  - md_in_html
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+extra_css:
+  - stylesheets/extra.css
+extra:
+  version:
+    provider: mike
+    default: stable
+nav:
+  - About: index.md
+#  - Installation: installation.md
+#  - Quick Start: quickstart.md
+  - API Reference: api_reference.md

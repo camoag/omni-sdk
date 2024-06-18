@@ -39,6 +39,10 @@ class DashboardEmbedUrl:
 
 
 class OmniDashboardEmbedder:
+    """Factory class that can build dashboard embedding URLs. The class can be instantiated with the omni
+    organization_name and embed_secret or if either of the kwargs are omitted their values will be pulled from the
+    environment variables OMNI_ORGANIZATION_NAME and OMNI_EMBED_SECRET.
+    """
 
     class PrefersDark(Enum):
         yes = "true"
@@ -83,6 +87,9 @@ class OmniDashboardEmbedder:
         theme: Theme | None = None,
         user_attributes: dict | None = None,
     ) -> str:
+        """Builds a signed dashboard embedding URL. For more information on the options see the [Omni Docs](
+        https://docs.omni.co/docs/embed/private-embedding#embed-url-customization-options)
+        """
 
         # Preprocess some values before passing to URL object.
         if link_access is True:
