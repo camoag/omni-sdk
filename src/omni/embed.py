@@ -8,6 +8,7 @@ import uuid
 from dataclasses import dataclass, asdict
 from enum import Enum
 
+from .env import OmniEnv
 from .utils import compact_json_dump
 
 
@@ -50,11 +51,24 @@ class OmniDashboardEmbedder:
         breeze = "breeze"
         blank = "blank"
 
-    def __init__(self, organization_name: str, embed_secret: str):
+    def __init__(
+        self, organization_name: str | None = None, embed_secret: str | None = None
+    ):
+        _organization_name = organization_name or OmniEnv.ORGANIZATION_NAME
+        if not _organization_name:
+            raise ValueError(
+                "organization_name is required if it is not configured in environment variables."
+            )
+        _embed_secret = embed_secret or OmniEnv.EMBED_SECRET
+        if not _embed_secret:
+            raise ValueError(
+                "embed_secret is required if it is not configured in environment variables."
+            )
+
         self.embed_login_url = (
-            f"https://{organization_name}.embed-omniapp.co/embed/login"
+            f"https://{_organization_name}.embed-omniapp.co/embed/login"
         )
-        self.embed_secret = embed_secret
+        self.embed_secret = _embed_secret
 
     def build_url(
         self,
