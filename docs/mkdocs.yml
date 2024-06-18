@@ -2,8 +2,6 @@ site_name: Omni SDK
 repo_url: https://github.com/tillable/omni-sdk
 theme:
   name: material
-#  logo: img/icon.png
-#  favicon: img/favicon.png
   icon:
     admonition:
       example: octicons/code-24
@@ -54,6 +52,4 @@ extra:
     default: stable
 nav:
   - About: index.md
-#  - Installation: installation.md
-#  - Quick Start: quickstart.md
   - API Reference: api_reference.md
