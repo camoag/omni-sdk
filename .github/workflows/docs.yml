@@ -33,4 +33,5 @@ jobs:
       - name: GH Pages deploy
         run: |
           cd docs
+          git pull origin gh-pages
           poetry run mike deploy --push --update-aliases `poetry run hatch version` stable
