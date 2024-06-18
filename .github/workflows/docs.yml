@@ -34,6 +34,6 @@ jobs:
       - name: GH Pages deploy
         run: |
           cd docs
-          poetry run mike set-default stable
           poetry run mike deploy --update-aliases `poetry run hatch version` stable
+          poetry run mike set-default stable
           git push -f origin gh-pages
