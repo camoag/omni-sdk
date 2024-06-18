@@ -54,7 +54,7 @@ class TestEmbed:
             "&prefersDark=true"
             "&theme=dawn"
             "&userAttributes=%7B%22country%22%3A%22USA%22%7D"
-            "&signature=Y8Alg2Sfdi5WdbwzU4QEugs3HdwLfEvXuBv8UU3BBZw%3D"
+            "&signature=uF-uUBou9HUBj3D1VYqRcW4GzZDrnHHXb3D4h46mZe4%3D"
         )
 
     def test_link_access(self, embedder):
@@ -66,7 +66,7 @@ class TestEmbed:
         )
         assert (
             url
-            == "https://acme.embed-omniapp.co/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&name=Somebody&nonce=365f7003aa5b4f3586d9b81b4a5d9f69&linkAccess=__omni_link_access_open&signature=0-XD5eTE8myI7n2Taew-ADXmm3c_kYNCkQFHFkfOvqU%3D"
+            == "https://acme.embed-omniapp.co/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&name=Somebody&nonce=365f7003aa5b4f3586d9b81b4a5d9f69&linkAccess=__omni_link_access_open&signature=JXwJzbukAno1Z4Dita2LjERHXrgTxlIJPW5wT5fyeIE%3D"
         )
         url = embedder.build_url(
             content_path="/dashboards/da24491e",
@@ -76,7 +76,7 @@ class TestEmbed:
         )
         assert (
             url
-            == "https://acme.embed-omniapp.co/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&name=Somebody&nonce=365f7003aa5b4f3586d9b81b4a5d9f69&linkAccess=abcd1234%2Cefgh5678&signature=rKpBYpOKIVQmCXNfhB7J8Z0WYnlELI5KmH4uPHc1048%3D"
+            == "https://acme.embed-omniapp.co/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&name=Somebody&nonce=365f7003aa5b4f3586d9b81b4a5d9f69&linkAccess=abcd1234%2Cefgh5678&signature=214_NXf7TH2jMaD_Oqq4XaYb7a0p2townEcJDyvlwUE%3D"
         )
 
     def test_filter_search_params(self, embedder):
@@ -95,7 +95,7 @@ class TestEmbed:
         assert (
             str_url
             == dict_url
-            == "https://acme.embed-omniapp.co/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&name=Somebody&nonce=365f7003aa5b4f3586d9b81b4a5d9f69&filterSearchParam=state%3DGA%26county%3DFulton&signature=ekzTS_BikwetRpIJK40t2V11YxKPMQ_YgaiN9b9GE9Y%3D"
+            == "https://acme.embed-omniapp.co/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&name=Somebody&nonce=365f7003aa5b4f3586d9b81b4a5d9f69&filterSearchParam=state%3DGA%26county%3DFulton&signature=fEdc10iIVXnB6uILOpGZ8tM8LbR_zBhK2YbwkL8NgyY%3D"
         )
 
     def test_missing_organization_name(self):

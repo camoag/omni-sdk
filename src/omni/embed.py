@@ -128,17 +128,18 @@ class OmniDashboardEmbedder:
         return str(url)
 
     def _sign_url(self, url: DashboardEmbedUrl) -> None:
+        # IMPORTANT: base_url must be first and all other attributes must be in alphabetical order.
         blob_items = [
             url.base_url,
             url.contentPath,
-            url.externalId,
-            url.name,
-            url.nonce,
             url.customTheme,
             url.entity,
+            url.externalId,
             url.filterSearchParam,
             url.linkAccess,
             url.prefersDark,
+            url.name,
+            url.nonce,
             url.theme,
             url.userAttributes,
         ]
