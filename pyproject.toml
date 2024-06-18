@@ -20,7 +20,7 @@ dependencies = []
 
 [tool]
 [tool.hatch.version]
-path = "src/flask_muck/__init__.py"
+path = "src/omni/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/omni"]
