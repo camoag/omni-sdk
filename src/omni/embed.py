@@ -128,6 +128,10 @@ class OmniDashboardEmbedder:
         return str(url)
 
     def _sign_url(self, url: DashboardEmbedUrl) -> None:
+        """Creates a signature and adds it to the URL object."""
+
+        # IMPORTANT: These must be in the correct order as documented here
+        # https://docs.omni.co/docs/embed/private-embedding#manually-generate-a-signature-and-url-hard-mode
         blob_items = [
             url.base_url,
             url.contentPath,
@@ -142,6 +146,7 @@ class OmniDashboardEmbedder:
             url.theme,
             url.userAttributes,
         ]
+
         blob = "\n".join([i for i in blob_items if i is not None])
         hmac_hash = hmac.new(
             self.embed_secret.encode("utf-8"), blob.encode("utf-8"), hashlib.sha256
