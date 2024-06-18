@@ -1,8 +1,8 @@
 name: Docs Deploy
-on: push
-#  release:
-#    types:
-#      - published
+on:
+  release:
+    types:
+      - published
 
 permissions:
   contents: write
