@@ -79,7 +79,7 @@ Other conventional commits such as `chore`, `ci`, `test`, `refactor`, etc will n
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dtiesling"><img src="https://avatars.githubusercontent.com/u/7133255?v=4?s=100" width="100px;" alt="Danny Tiesling"/><br /><sub><b>Danny Tiesling</b></sub></a><br /><a href="https://github.com/tillable/omni-sdk/commits?author=dtiesling" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dtiesling"><img src="https://avatars.githubusercontent.com/u/7133255?v=4?s=100" width="100px;" alt="Danny Tiesling"/><br /><sub><b>Danny Tiesling</b></sub></a><br /><a href="https://github.com/tillable/omni-sdk/commits?author=dtiesling" title="Code">💻</a> <a href="https://github.com/tillable/omni-sdk/commits?author=dtiesling" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>
