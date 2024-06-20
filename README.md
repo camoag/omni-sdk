@@ -14,13 +14,13 @@ For installation, configuration and usage view the docs [here](https://tillable.
 
 ## Bug Reports
 
-Submit any issues you may encounter as a  [GitHub issue](https://github.com/dtiesling/flask-muck/issues). Please search for 
+Submit any issues you may encounter as a  [GitHub issue](https://github.com/tillable/omni-sdk/issues). Please search for 
 similar issues before submitting a new one.
 
 ## Questions, Concerns, Ideas, Support, Feature Requests
 
 All non-bug-related discussions such as support or feature requests should be submitted as a
-[GitHub Discussion](https://github.com/dtiesling/flask-muck/discussions). 
+[GitHub Discussion](https://github.com/tillable/omni-sdk/discussions). 
 
 ## License
 
