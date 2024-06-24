@@ -98,6 +98,17 @@ class TestEmbed:
             == "https://acme.embed-omniapp.co/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&name=Somebody&nonce=365f7003aa5b4f3586d9b81b4a5d9f69&filterSearchParam=state%3DGA%26county%3DFulton&signature=ekzTS_BikwetRpIJK40t2V11YxKPMQ_YgaiN9b9GE9Y%3D"
         )
 
+        empty_dict_url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+            filter_search_params={},
+        )
+        assert (
+            empty_dict_url
+            == "https://acme.embed-omniapp.co/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&name=Somebody&nonce=365f7003aa5b4f3586d9b81b4a5d9f69&signature=mToqUfdkmVSyDIGAl6Ggs9uAmGQAH9OzbbCZ-xgEU8c%3D"
+        )
+
     def test_missing_organization_name(self):
         with pytest.raises(ValueError):
             OmniDashboardEmbedder(embed_secret="super_secret")

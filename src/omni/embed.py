@@ -103,6 +103,9 @@ class OmniDashboardEmbedder:
                 "link_access must be a list of dashboard IDs or True to allow links to all dashboards."
             )
 
+        # Convert empty dicts and strings to None.
+        filter_search_params = filter_search_params or None
+
         if isinstance(filter_search_params, dict):
             filter_search_params = urllib.parse.urlencode(
                 filter_search_params, doseq=True
