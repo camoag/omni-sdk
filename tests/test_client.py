@@ -6,7 +6,7 @@ from tests import omni_vcr
 
 @pytest.fixture
 def client():
-    return OmniApiClient()
+    return OmniApiClient(organization_name="test", api_token="secret_token")
 
 
 class TestClient:

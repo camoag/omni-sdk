@@ -13,7 +13,7 @@ interactions:
       User-Agent:
       - python-requests/2.32.3
     method: POST
-    uri: https://camo.omniapp.co/api/v0/model/b4dd2fbc-2b0c-4ae9-8f93-16a53f395514/refresh
+    uri: https://test.omniapp.co/api/v0/model/b4dd2fbc-2b0c-4ae9-8f93-16a53f395514/refresh
   response:
     body:
       string: !!binary |

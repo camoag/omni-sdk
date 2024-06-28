@@ -17,21 +17,16 @@ class OmniApiClient:
         self, organization_name: str | None = None, api_token: str | None = None
     ) -> None:
         _organization_name = organization_name or OmniEnv.ORGANIZATION_NAME
+        self.base_url = f"https://{_organization_name}.omniapp.co/api"
+        self.api_token = api_token or OmniEnv.API_KEY
         if not _organization_name:
             raise ValueError(
                 "OmniClient must be instantiated with an organization_name or the OMNI_ORGANIZATION_NAME environment variable must be set."
             )
-        self.base_url = f"https://{_organization_name}.omniapp.co/api"
-
-        self.api_token = api_token or OmniEnv.API_KEY
         if not self.api_token:
             raise ValueError(
                 "OmniClient must be instantiated with an api_token or the OMNI_API_TOKEN environment variable must be set."
             )
-
-    @property
-    def headers(self):
-        return {"Authorization": f"Bearer {self.api_token}"}
 
     def refresh_model(self, model_id: str) -> bool:
         """Refreshes this model to reflect the latest structures (schemas, views, fields) from the data source.
@@ -41,19 +36,19 @@ class OmniApiClient:
         self.post(f"/v0/model/{model_id}/refresh")
         return True
 
-    def get(self, path, params: dict | None = None) -> dict:
+    def get(self, path: str, params: dict | None = None) -> dict:
         """Makes a GET request to the Omni REST API."""
         return self._request("GET", path, params=params)
 
-    def post(self, path, json_data: dict | None = None) -> dict:
+    def post(self, path: str, json_data: dict | None = None) -> dict:
         """Makes a POST request to the Omni REST API."""
         return self._request("POST", path, json_data=json_data)
 
-    def put(self, path, json_data: dict | None = None) -> dict:
+    def put(self, path: str, json_data: dict | None = None) -> dict:
         """Makes a PUT request to the Omni REST API."""
         return self._request("PUT", path, json_data=json_data)
 
-    def delete(self, path, json_data: dict | None = None) -> dict:
+    def delete(self, path: str, json_data: dict | None = None) -> dict:
         """Makes a DELETE request to the Omni REST API."""
         return self._request("DELETE", path, json_data=json_data)
 
@@ -67,10 +62,12 @@ class OmniApiClient:
         json_data: dict | None = None,
         params: dict | None = None,
     ) -> dict:
-        url = self._get_url(path)
-        request_kwargs = dict(
-            method=method, url=url, json=json_data, headers=self.headers, params=params
+        response = requests.request(
+            method=method,
+            headers={"Authorization": f"Bearer {self.api_token}"},
+            url=self._get_url(path),
+            json=json_data,
+            params=params,
         )
-        response = requests.request(**request_kwargs)
         response.raise_for_status()
         return response.json()
