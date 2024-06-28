@@ -128,8 +128,12 @@ class TestUnit:
             filter_search_params={},
         )
         assert (
-            empty_dict_url
-            == "https://acme.embed-omniapp.co/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&name=Somebody&nonce=365f7003aa5b4f3586d9b81b4a5d9f69&signature=mToqUfdkmVSyDIGAl6Ggs9uAmGQAH9OzbbCZ-xgEU8c%3D"
+            empty_dict_url == "https://acme.embed-omniapp.co/embed/login?"
+            "contentPath=%2Fdashboards%2Fda24491e"
+            "&externalId=1"
+            "&name=Somebody"
+            "&nonce=365f7003aa5b4f3586d9b81b4a5d9f69"
+            "&signature=TjqD3emJJshOglYXfV5z-W9SV1nB0pW82zTl6ki4zrg%3D"
         )
 
     def test_missing_organization_name(self):
