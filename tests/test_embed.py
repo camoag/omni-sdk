@@ -168,7 +168,7 @@ class TestIntegration:
         generated_signature = params.pop("signature")
         params["secret"] = embedder.embed_secret
 
-        # Do some string manipulation to create url for the Omni signature verification endpoint.
+        # Do some string manipulation to create url for Omni signature verification endpoint.
         expected_url = requests.post(
             "https://acme.embed-omniapp.co/embed/sso/generate-url", json=params
         ).json()["url"]
