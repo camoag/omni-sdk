@@ -5,7 +5,7 @@ import hashlib
 import hmac
 import urllib.parse
 import uuid
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from enum import Enum
 
 from .env import OmniEnv
@@ -56,22 +56,25 @@ class OmniDashboardEmbedder:
         blank = "blank"
 
     def __init__(
-        self, organization_name: str | None = None, embed_secret: str | None = None
+        self,
+        organization_name: str | None = None,
+        embed_secret: str | None = None,
+        vanity_domain: str | None = None,
     ):
         _organization_name = organization_name or OmniEnv.ORGANIZATION_NAME
-        if not _organization_name:
-            raise ValueError(
-                "organization_name is required if it is not configured in environment variables."
-            )
+        _vanity_domain = vanity_domain or OmniEnv.VANITY_DOMAIN
+        if not (_organization_name or _vanity_domain):
+            raise ValueError("'vanity_domain' or 'organization_name' are required.")
         _embed_secret = embed_secret or OmniEnv.EMBED_SECRET
         if not _embed_secret:
             raise ValueError(
                 "embed_secret is required if it is not configured in environment variables."
             )
 
-        self.embed_login_url = (
-            f"https://{_organization_name}.embed-omniapp.co/embed/login"
+        embed_host = (
+            vanity_domain if vanity_domain else f"{_organization_name}.embed-omniapp.co"
         )
+        self.embed_login_url = f"https://{embed_host}/embed/login"
         self.embed_secret = _embed_secret
 
     def build_url(
