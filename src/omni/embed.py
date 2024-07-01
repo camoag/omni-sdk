@@ -71,9 +71,7 @@ class OmniDashboardEmbedder:
                 "embed_secret is required if it is not configured in environment variables."
             )
 
-        embed_host = (
-            vanity_domain if vanity_domain else f"{_organization_name}.embed-omniapp.co"
-        )
+        embed_host = _vanity_domain or f"{_organization_name}.embed-omniapp.co"
         self.embed_login_url = f"https://{embed_host}/embed/login"
         self.embed_secret = _embed_secret
 
