@@ -1,6 +1,6 @@
 name: Pypi Publish
 
-on: commit
+on: push
 #on:
 #  release:
 #    types:
