@@ -200,7 +200,7 @@ class OmniFilterSet:
     be used by the OmniDashboardEmbedder.
     """
 
-    def __init__(self, **filters: dict[str, OmniFilterDefinition]) -> None:
+    def __init__(self, **filters: OmniFilterDefinition) -> None:
         for value in filters.values():
             if not isinstance(value, OmniFilterDefinition):
                 raise TypeError("Filters must be an OmniFilterDefinition object.")
