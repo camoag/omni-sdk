@@ -77,6 +77,7 @@ class OmniDashboardEmbedder:
             or f"{omni_config.organization_name}.embed-omniapp.co"
         )
         self.embed_login_url = f"https://{embed_host}/embed/login"
+        assert omni_config.embed_secret  # Required to appease mypy.
         self.embed_secret = omni_config.embed_secret
 
     def build_url(
