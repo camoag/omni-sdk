@@ -202,13 +202,56 @@ class TestEmbed:
 
 
 class TestFilters:
-    def test_get_filter_search_param_info(self):
+
+    @pytest.mark.parametrize(
+        "filter_type,operator,value,expected",
+        [
+            (
+                OmniFilterDefinition.Type.number,
+                OmniFilterDefinition.Operator.equals,
+                10,
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [10]}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.number,
+                OmniFilterDefinition.Operator.greater_than,
+                10,
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_inclusive": false, "is_negative": false, "kind": "GREATER_THAN", "type": "number", "values": [10]}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.number,
+                OmniFilterDefinition.Operator.less_than,
+                10,
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_inclusive": false, "is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10]}'
+                    ],
+                ),
+            ),
+        ],
+    )
+    def test_filters(self, filter_type, operator, value, expected):
         filter = OmniFilterDefinition(
-            attribute="cart.total",
-            type=OmniFilterDefinition.type.number,
-            operator=OmniFilterDefinition.Operator.equals,
+            attribute="some.attr",
+            type=filter_type,
+            operator=operator,
         )
-        assert filter.get_filter_search_param_info(10) == {}
+        assert filter.get_filter_search_param_info(value) == expected
+
+    def test_bad_filters_in_filter_set(self):
+        with pytest.raises(TypeError):
+            OmniFilterSet(fail="nope")
 
     def test_filter_set(self):
         filter_set = OmniFilterSet(

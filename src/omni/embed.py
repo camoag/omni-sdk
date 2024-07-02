@@ -172,8 +172,6 @@ class OmniFilterDefinition:
     attribute: str
     type: Type
     operator: Operator = Operator.equals
-    is_inclusive: bool = False
-    is_negative: bool = False
 
     def get_filter_search_param_info(
         self, values: str | int | float | list[str | int | float]
@@ -185,8 +183,8 @@ class OmniFilterDefinition:
         filter_value = [
             json.dumps(
                 {
-                    "is_inclusive": self.is_inclusive,  # FUTURE: Set this dynamically if needed for future operators.
-                    "is_negative": self.is_negative,
+                    "is_inclusive": False,  # FUTURE: Set this dynamically if needed for future operators.
+                    "is_negative": False,
                     "kind": self.operator.value,
                     "type": self.type.value,
                     "values": values,
@@ -197,17 +195,30 @@ class OmniFilterDefinition:
 
 
 class OmniFilterSet:
-    def __init__(self, **filters: dict[str, OmniFilterDefinition]) -> None:
-        self.filters = filters
+    """Helper class for generating a set of filter search parameters for an embedded dashboard. This class is designed
+    to abstract the complexity of the Omni filters and create a simple interface for generating the filter values to
+    be used by the OmniDashboardEmbedder.
+    """
 
-    def register_filter(
-        self, name: str, filter_definition: OmniFilterDefinition
-    ) -> None:
-        self.filters[name] = filter_definition
+    def __init__(self, **filters: dict[str, OmniFilterDefinition]) -> None:
+        for value in filters.values():
+            if not isinstance(value, OmniFilterDefinition):
+                raise TypeError("Filters must be an OmniFilterDefinition object.")
+        self._filters = filters
+
+    @property
+    def filters(self) -> dict[str, OmniFilterDefinition]:
+        """Returns the dictionary of filters used to create this OmniFilterSet."""
+        # Using a property function here to discourage manipulating filters after instantiation.
+        return self._filters
 
     def get_filter_search_params(
         self, filter_values: dict[str, str | int | float]
     ) -> dict[str, list[str]]:
+        """Given a dictionary of filter keys and values this function returns the dictionary of expected to populate
+        the filter_search_params kwarg when calling OmniDashboardEmbedder.build_url. This method is ideal for
+        translating query params in the encapsulating application to Omni filter search parameters.
+        """
         filter_search_params = {}
         for query_param, value in filter_values.items():
             omni_filter = self.filters[query_param]
