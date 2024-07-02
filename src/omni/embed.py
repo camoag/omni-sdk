@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
+import json
 import urllib.parse
 import uuid
 from dataclasses import asdict, dataclass
@@ -156,3 +157,67 @@ class OmniDashboardEmbedder:
             self.embed_secret.encode("utf-8"), blob.encode("utf-8"), hashlib.sha256
         ).digest()
         url.signature = base64.urlsafe_b64encode(hmac_hash).decode("utf-8")
+
+
+@dataclass
+class OmniFilterDefinition:
+    """Defines an Omni filter. Designed to be used in the `filters` attribute of a report in the reports_config.py
+
+    attribute: Name of the filtered attribute (i.e. omni_dbt__address.latitude_filter)
+    operator: Filter operator to use.
+    type: Type of the value that should be passed to the filter.
+    """
+
+    class Type(Enum):
+        number = "number"
+
+    class Operator(Enum):
+        equals = "EQUALS"
+        less_than = "LESS_THAN"
+        greater_than = "GREATER_THAN"
+
+    attribute: str
+    type: Type
+    operator: Operator = Operator.equals
+    is_inclusive: bool = False
+    is_negative: bool = False
+
+    def get_filter_search_param_info(
+        self, values: str | int | float | list[str | int | float]
+    ) -> tuple[str, list[str]]:
+        """Returns the key and value to be used in a query string for an Omni Dashboard."""
+        if not isinstance(values, list):
+            values = [values]
+        filter_key = f"f--{self.attribute}"
+        filter_value = [
+            json.dumps(
+                {
+                    "is_inclusive": self.is_inclusive,  # FUTURE: Set this dynamically if needed for future operators.
+                    "is_negative": self.is_negative,
+                    "kind": self.operator.value,
+                    "type": self.type.value,
+                    "values": values,
+                }
+            )
+        ]
+        return filter_key, filter_value
+
+
+class OmniFilterSet:
+    def __init__(self, **filters: dict[str, OmniFilterDefinition]) -> None:
+        self.filters = filters
+
+    def register_filter(
+        self, name: str, filter_definition: OmniFilterDefinition
+    ) -> None:
+        self.filters[name] = filter_definition
+
+    def get_filter_search_params(
+        self, filter_values: dict[str, str | int | float]
+    ) -> dict[str, list[str]]:
+        filter_search_params = {}
+        for query_param, value in filter_values.items():
+            omni_filter = self.filters[query_param]
+            filter_key, filter_value = omni_filter.get_filter_search_param_info(value)
+            filter_search_params[filter_key] = filter_value
+        return filter_search_params

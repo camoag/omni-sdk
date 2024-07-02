@@ -1,6 +1,7 @@
 import pytest
 
 from omni import OmniDashboardEmbedder
+from omni.embed import OmniFilterDefinition, OmniFilterSet
 
 
 @pytest.fixture
@@ -198,3 +199,43 @@ class TestEmbed:
         monkeypatch.setenv("OMNI_VANITY_DOMAIN", "foo.example.com")
         monkeypatch.setenv("OMNI_EMBED_SECRET", "super_secret")
         OmniDashboardEmbedder()
+
+
+class TestFilters:
+    def test_get_filter_search_param_info(self):
+        filter = OmniFilterDefinition(
+            attribute="cart.total",
+            type=OmniFilterDefinition.type.number,
+            operator=OmniFilterDefinition.Operator.equals,
+        )
+        assert filter.get_filter_search_param_info(10) == {}
+
+    def test_filter_set(self):
+        filter_set = OmniFilterSet(
+            latitude=OmniFilterDefinition(
+                attribute="address.latitude_filter",
+                type=OmniFilterDefinition.Type.number,
+            ),
+            longitude=OmniFilterDefinition(
+                attribute="address.longitude_filter",
+                type=OmniFilterDefinition.Type.number,
+            ),
+            distance=OmniFilterDefinition(
+                attribute="address.distance_selected_to_address_in_miles",
+                type=OmniFilterDefinition.Type.number,
+                operator=OmniFilterDefinition.Operator.less_than,
+            ),
+        )
+        assert filter_set.get_filter_search_params(
+            {"latitude": 33.555, "longitude": -117.602, "distance": 10}
+        ) == {
+            "f--address.distance_selected_to_address_in_miles": [
+                '{"is_inclusive": false, "is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10]}'
+            ],
+            "f--address.latitude_filter": [
+                '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [33.555]}'
+            ],
+            "f--address.longitude_filter": [
+                '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [-117.602]}'
+            ],
+        }
