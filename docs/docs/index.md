@@ -34,8 +34,16 @@ For more information on the options see the [Omni Docs](https://docs.omni.co/doc
 ```python
 from omni import OmniDashboardEmbedder
 
-# kwargs are not required if environment variables have been configured.
+# kwargs in OmniDashboardEmbedder constructor are not required if environment variables have been configured.
+
+# Using 'organization_name'
 embedder = OmniDashboardEmbedder(organization_name="acme", embed_secret="vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC")
+
+# Using 'vanity_domain'
+embedder = OmniDashboardEmbedder(vanity_domain="acme.example.com", embed_secret="vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC")
+
+# If all options defined as ENV variables
+embedder = OmniDashboardEmbedder()
 
 url = embedder.build_url(
     content_path="/dashboards/da24491e",
@@ -55,7 +63,7 @@ url = embedder.build_url(
 ```
 
 ### Refresh a model
-Refreshes a model to reflect the latest structures (schemas, views, fields) from the data source. This will remove any 
+Refreshes a model to reflect the latest structures (schemas, views, fields) from the data source. This will remove any
 structures that are no longer present in the source, but will not remove anything created by users.
 
 ```python
@@ -69,4 +77,4 @@ client.refresh_model("f0970eb8-785a-460b-9ced-cf603e160558")
 
 
 
- 
+
