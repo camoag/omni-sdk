@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0-alpha](https://github.com/tillable/omni-sdk/compare/v0.1.1-alpha...v0.2.0-alpha) (2024-07-01)
+
+
+### Features
+
+* support embedding urls using a vanity domain ([#15](https://github.com/tillable/omni-sdk/issues/15)) ([1d23d68](https://github.com/tillable/omni-sdk/commit/1d23d68ac570e77d50b45e0fe3e11b3a7832424b))
+
 ## [0.1.1-alpha](https://github.com/tillable/omni-sdk/compare/v0.1.0-alpha...v0.1.1-alpha) (2024-06-24)
 
 
