@@ -161,13 +161,6 @@ class OmniDashboardEmbedder:
 
 @dataclass
 class OmniFilterDefinition:
-    """Defines an Omni filter. Designed to be used in the `filters` attribute of a report in the reports_config.py
-
-    attribute: Name of the filtered attribute (i.e. omni_dbt__address.latitude_filter)
-    operator: Filter operator to use.
-    type: Type of the value that should be passed to the filter.
-    """
-
     class Type(Enum):
         number = "number"
 
