@@ -48,8 +48,6 @@ vcrpy = "^6.0.1"
 types-requests = "<2.31.0.7"
 
 
-
-
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^9.4.11"
 mkdocstrings = {extras = ["python"], version = "^0.24.0"}
