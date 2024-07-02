@@ -8,11 +8,11 @@
 
 #### pip
 
-`pip install git+https://github.com/tillable/omni-sdk.git`
+`pip install omni-analytics-sdk`
 
 #### poetry
 
-`poetry add git+https://github.com/tillable/omni-sdk.git`
+`poetry add omni-analytics-sdk`
 
 ## Configuration
 

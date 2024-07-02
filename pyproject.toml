@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "omni"
+name = "omni-analytics-sdk"
 version = "0.2.0-alpha"
 authors = [
   { name="Daniel Tiesling", email="daniel.tiesling@camo.ag" },
@@ -16,7 +16,14 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = []
+dependencies = [
+    "python >= 3.9"
+]
+
+[project.urls]
+"Homepage" = "https://tillable.github.io/omni-sdk/stable/"
+"Repository" = "https://github.com/tillable/omni-sdk"
+"Documentation" = "https://dtiesling.github.io/flask-muck/"
 
 [tool]
 [tool.hatch.version]
