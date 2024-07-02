@@ -4,7 +4,7 @@ from typing import Literal
 
 import requests
 
-from .env import OmniEnv
+from .config import OmniConfig
 
 
 class OmniApiClient:
@@ -16,17 +16,13 @@ class OmniApiClient:
     def __init__(
         self, organization_name: str | None = None, api_token: str | None = None
     ) -> None:
-        _organization_name = organization_name or OmniEnv.ORGANIZATION_NAME
-        self.base_url = f"https://{_organization_name}.omniapp.co/api"
-        self.api_token = api_token or OmniEnv.API_KEY
-        if not _organization_name:
-            raise ValueError(
-                "OmniClient must be instantiated with an organization_name or the OMNI_ORGANIZATION_NAME environment variable must be set."
-            )
-        if not self.api_token:
-            raise ValueError(
-                "OmniClient must be instantiated with an api_token or the OMNI_API_TOKEN environment variable must be set."
-            )
+        omni_config = OmniConfig(
+            required_attrs=["organization_name", "api_token"],
+            organization_name=organization_name,
+            api_token=api_token,
+        )
+        self.base_url = f"https://{omni_config.organization_name}.omniapp.co/api"
+        self.api_token = omni_config.api_token
 
     def refresh_model(self, model_id: str) -> bool:
         """Refreshes this model to reflect the latest structures (schemas, views, fields) from the data source.
