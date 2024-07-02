@@ -6,7 +6,7 @@ from tests import omni_vcr
 
 @pytest.fixture
 def client():
-    return OmniApiClient(organization_name="test", api_token="secret_token")
+    return OmniApiClient(organization_name="test", api_key="secret_token")
 
 
 class TestUnit:
@@ -17,7 +17,7 @@ class TestUnit:
 
     def test_env_configuration(self, monkeypatch):
         monkeypatch.setenv("OMNI_ORGANIZATION_NAME", "acme")
-        monkeypatch.setenv("OMNI_API_TOKEN", "api_key_1")
+        monkeypatch.setenv("OMNI_API_KEY", "api_key_1")
         client = OmniApiClient()
-        assert client.api_token == "api_key_1"
+        assert client.api_key == "api_key_1"
         assert client.base_url == "https://acme.omniapp.co/api"

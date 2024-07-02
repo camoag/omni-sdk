@@ -1,6 +1,7 @@
 import pytest
 
 from omni import OmniDashboardEmbedder
+from omni.config import OmniConfigError
 
 
 @pytest.fixture
@@ -179,14 +180,14 @@ class TestUnit:
         )
 
     def test_missing_organization_name_or_vanity_domain(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(OmniConfigError):
             OmniDashboardEmbedder(embed_secret="super_secret")
 
     def test_missing_embed_secret(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(OmniConfigError):
             OmniDashboardEmbedder(organization_name="acme")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(OmniConfigError):
             OmniDashboardEmbedder(vanity_domain="foo.example.com")
 
     def test_env_configuration_with_organization(self, monkeypatch):

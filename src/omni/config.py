@@ -13,7 +13,7 @@ class OmniConfig:
     organization_name: str | None = None
     vanity_domain: str | None = None
     embed_secret: str | None = None
-    api_token: str | None = None
+    api_key: str | None = None
 
     @staticmethod
     def _get_env_var(attr_name: str) -> str:

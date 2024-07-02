@@ -14,15 +14,15 @@ class OmniApiClient:
     """
 
     def __init__(
-        self, organization_name: str | None = None, api_token: str | None = None
+        self, organization_name: str | None = None, api_key: str | None = None
     ) -> None:
         omni_config = OmniConfig(
-            required_attrs=["organization_name", "api_token"],
+            required_attrs=["organization_name", "api_key"],
             organization_name=organization_name,
-            api_token=api_token,
+            api_key=api_key,
         )
         self.base_url = f"https://{omni_config.organization_name}.omniapp.co/api"
-        self.api_token = omni_config.api_token
+        self.api_key = omni_config.api_key
 
     def refresh_model(self, model_id: str) -> bool:
         """Refreshes this model to reflect the latest structures (schemas, views, fields) from the data source.
@@ -60,7 +60,7 @@ class OmniApiClient:
     ) -> dict:
         response = requests.request(
             method=method,
-            headers={"Authorization": f"Bearer {self.api_token}"},
+            headers={"Authorization": f"Bearer {self.api_key}"},
             url=self._get_url(path),
             json=json_data,
             params=params,
