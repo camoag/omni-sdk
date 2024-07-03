@@ -9,7 +9,7 @@ def client():
     return OmniApiClient(organization_name="test", api_key="secret_token")
 
 
-class TestUnit:
+class TestClient:
 
     @omni_vcr.use_cassette()
     def test_refresh_model(self, client):
