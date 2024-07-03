@@ -1,6 +1,7 @@
 import pytest
 
 from omni import OmniDashboardEmbedder
+from omni.config import OmniConfigError
 from omni.embed import OmniFilterDefinition, OmniFilterSet
 
 
@@ -180,25 +181,28 @@ class TestEmbed:
         )
 
     def test_missing_organization_name_or_vanity_domain(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(OmniConfigError):
             OmniDashboardEmbedder(embed_secret="super_secret")
 
     def test_missing_embed_secret(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(OmniConfigError):
             OmniDashboardEmbedder(organization_name="acme")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(OmniConfigError):
             OmniDashboardEmbedder(vanity_domain="foo.example.com")
 
     def test_env_configuration_with_organization(self, monkeypatch):
         monkeypatch.setenv("OMNI_ORGANIZATION_NAME", "acme")
         monkeypatch.setenv("OMNI_EMBED_SECRET", "super_secret")
-        OmniDashboardEmbedder()
+        embedder = OmniDashboardEmbedder()
+        assert embedder.embed_secret == "super_secret"
+        assert embedder.embed_login_url == "https://acme.embed-omniapp.co/embed/login"
 
     def test_env_configuration_with_vanity_domain(self, monkeypatch):
         monkeypatch.setenv("OMNI_VANITY_DOMAIN", "foo.example.com")
         monkeypatch.setenv("OMNI_EMBED_SECRET", "super_secret")
-        OmniDashboardEmbedder()
+        embedder = OmniDashboardEmbedder()
+        assert embedder.embed_login_url == "https://foo.example.com/embed/login"
 
 
 class TestFilters:

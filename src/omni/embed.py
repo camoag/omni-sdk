@@ -9,7 +9,7 @@ import uuid
 from dataclasses import asdict, dataclass
 from enum import Enum
 
-from .env import OmniEnv
+from .config import OmniConfig, OmniConfigError
 from .utils import compact_json_dump
 
 
@@ -62,19 +62,27 @@ class OmniDashboardEmbedder:
         embed_secret: str | None = None,
         vanity_domain: str | None = None,
     ):
-        _organization_name = organization_name or OmniEnv.ORGANIZATION_NAME
-        _vanity_domain = vanity_domain or OmniEnv.VANITY_DOMAIN
-        if not (_organization_name or _vanity_domain):
-            raise ValueError("'vanity_domain' or 'organization_name' are required.")
-        _embed_secret = embed_secret or OmniEnv.EMBED_SECRET
-        if not _embed_secret:
-            raise ValueError(
-                "embed_secret is required if it is not configured in environment variables."
+        omni_config = OmniConfig(
+            required_attrs=["embed_secret"],
+            organization_name=organization_name,
+            embed_secret=embed_secret,
+            vanity_domain=vanity_domain,
+        )
+        if not omni_config.vanity_domain and not omni_config.organization_name:
+            raise OmniConfigError(
+                "You must pass the vanity_domain or organization_name arguments OR "
+                "set the OMNI_ORGANIZATION_NAME or OMNI_VANITY_DOMAIN environment variables."
             )
-
-        embed_host = _vanity_domain or f"{_organization_name}.embed-omniapp.co"
+        embed_host = (
+            omni_config.vanity_domain
+            or f"{omni_config.organization_name}.embed-omniapp.co"
+        )
         self.embed_login_url = f"https://{embed_host}/embed/login"
-        self.embed_secret = _embed_secret
+
+        # Required to appease mypy. If embed_secret is missing an OmniConfigError will have already been raised by the OmniConfig class.
+        assert omni_config.embed_secret
+
+        self.embed_secret = omni_config.embed_secret
 
     def build_url(
         self,
