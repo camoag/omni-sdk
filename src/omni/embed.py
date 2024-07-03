@@ -39,9 +39,9 @@ class DashboardEmbedUrl:
 
 
 class OmniDashboardEmbedder:
-    """Factory class that can build dashboard embedding URLs. The class can be instantiated with the omni
-    organization_name and embed_secret or if either of the kwargs are omitted their values will be pulled from the
-    environment variables OMNI_ORGANIZATION_NAME and OMNI_EMBED_SECRET.
+    """Factory class that can build dashboard embedding URLs. The class can be instantiated with the Omni
+    domain (organization_name or vanity_domain) and embed_secret or if either of the kwargs are omitted their values will be pulled from the
+    environment variables (OMNI_ORGANIZATION_NAME or OMNI_VANITY_DOMAIN) and OMNI_EMBED_SECRET.
     """
 
     class PrefersDark(Enum):
