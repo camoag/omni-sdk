@@ -51,5 +51,12 @@ extra:
     provider: mike
     default: stable
 nav:
-  - About: index.md
-  - API Reference: api_reference.md
+  - Getting Started: index.md
+  - Usage:
+    - Dashboard Embedding: usage/dashboard_embedding.md
+    - REST API Client: usage/api_client.md
+  - API Reference:
+    - Dashboard Embedding:
+      - omni.OmniDashboardEmbedder: api/OmniDashboardEmbedder.md
+      - omni.OmniFilterDefinition: api/OmniFilterDefinition.md
+      - omni.OmniFilterSet: api/OmniFilterSet.md

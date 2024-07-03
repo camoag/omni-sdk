@@ -247,7 +247,7 @@ class TestFilters:
     )
     def test_filters(self, filter_type, operator, value, expected):
         filter = OmniFilterDefinition(
-            attribute="some.attr",
+            field="some.attr",
             type=filter_type,
             operator=operator,
         )
@@ -260,15 +260,15 @@ class TestFilters:
     def test_filter_set(self):
         filter_set = OmniFilterSet(
             latitude=OmniFilterDefinition(
-                attribute="address.latitude_filter",
+                field="address.latitude_filter",
                 type=OmniFilterDefinition.Type.number,
             ),
             longitude=OmniFilterDefinition(
-                attribute="address.longitude_filter",
+                field="address.longitude_filter",
                 type=OmniFilterDefinition.Type.number,
             ),
             distance=OmniFilterDefinition(
-                attribute="address.distance_selected_to_address_in_miles",
+                field="address.distance_selected_to_address_in_miles",
                 type=OmniFilterDefinition.Type.number,
                 operator=OmniFilterDefinition.Operator.less_than,
             ),

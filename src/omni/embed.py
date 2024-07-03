@@ -177,7 +177,7 @@ class OmniFilterDefinition:
         less_than = "LESS_THAN"
         greater_than = "GREATER_THAN"
 
-    attribute: str
+    field: str
     type: Type
     operator: Operator = Operator.equals
 
@@ -187,7 +187,7 @@ class OmniFilterDefinition:
         """Returns the key and value to be used in a query string for an Omni Dashboard."""
         if not isinstance(values, list):
             values = [values]
-        filter_key = f"f--{self.attribute}"
+        filter_key = f"f--{self.field}"
         filter_value = [
             json.dumps(
                 {
