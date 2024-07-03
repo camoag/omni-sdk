@@ -1,0 +1,54 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      User-Agent:
+      - python-requests/2.32.3
+    method: POST
+    uri: https://test.omniapp.co/api/v0/model/b4dd2fbc-2b0c-4ae9-8f93-16a53f395514/refresh
+  response:
+    body:
+      string: '{"message":"Not found"}'
+    headers:
+      Cache-Control:
+      - no-cache, no-store
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '23'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 03 Jul 2024 04:07:23 GMT
+      ETag:
+      - W/"17-JG2JTE6to/D4sxc2pRx7Kk+opAc"
+      Expires:
+      - '0'
+      Permissions-Policy:
+      - microphone=(), camera=(), geolocation=()
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-XSS-Protection:
+      - 1; mode=block
+      x-trace-id:
+      - Root=1-6684ce7b-554e4377183f2dba67e508aa
+    status:
+      code: 404
+      message: Not Found
+version: 1

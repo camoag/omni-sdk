@@ -22,7 +22,7 @@ def patch_uuid(monkeypatch):
     monkeypatch.setattr("uuid.UUID.hex", "365f7003aa5b4f3586d9b81b4a5d9f69")
 
 
-class TestEmbed:
+class TestUnit:
     def test_basic_url(self, embedder, vanity_domain_embedder):
         url = embedder.build_url(
             content_path="/dashboards/da24491e",
