@@ -33,11 +33,27 @@ class OmniApiClient:
         return True
 
     def get(self, path: str, params: dict | None = None) -> dict:
-        """Makes a GET request to the Omni REST API."""
+        """Makes a GET request to the Omni REST API.
+
+        Parameters:
+            path: The path in the Omni REST API to make a GET request.
+            params: Query string parameters to use in the GET request.
+
+        Returns:
+            JSON response from the Omni REST API.
+        """
         return self._request("GET", path, params=params)
 
     def post(self, path: str, json_data: dict | None = None) -> dict:
-        """Makes a POST request to the Omni REST API."""
+        """Makes a POST request to the Omni REST API.
+
+        Parameters:
+            path: The path in the Omni REST API to make a GET request.
+            json_data: Query string parameters to use in the GET request.
+
+        Returns:
+            JSON response from the Omni REST API.
+        """
         return self._request("POST", path, json_data=json_data)
 
     def put(self, path: str, json_data: dict | None = None) -> dict:

@@ -4,8 +4,16 @@ For more information on the options see the [Omni Docs](https://docs.omni.co/doc
 ```python
 from omni import OmniDashboardEmbedder
 
-# kwargs can be skipped if env vars have been configured.
+# kwargs in OmniDashboardEmbedder constructor are not required if environment variables have been configured.
+
+# Using 'organization_name'
 embedder = OmniDashboardEmbedder(organization_name="acme", embed_secret="vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC")
+
+# Using 'vanity_domain'
+embedder = OmniDashboardEmbedder(vanity_domain="acme.example.com", embed_secret="vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC")
+
+# If all options defined as ENV variables
+embedder = OmniDashboardEmbedder()
 
 url = embedder.build_url(
     content_path="/dashboards/da24491e",
@@ -23,6 +31,14 @@ url = embedder.build_url(
     user_attributes={"country": "USA"},
 )
 ```
+
+## Organization Name vs. Vanity Domain 
+
+The `OmniDashboardEmbedder` can be instantiated using either the `organization_name` or `vanity_domain` kwargs. 
+Using `organization_name` results in the standard Omni endpoint being used for the embedded dashboard URL. 
+Omni has support for configuring a vanity domain to host the embedded dashboards. You can learn about its advantages 
+and instructions for setup [here](https://docs.omni.co/docs/embed/private-embedding#use-a-vanity-domain).
+Once your vanity domain is setup you may instantiate the `OmniDashboardEmbedder` with it to generate the correct URLs.
 
 ## Generating Filter Search Params
 

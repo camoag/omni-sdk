@@ -60,3 +60,5 @@ nav:
       - omni.OmniDashboardEmbedder: api/OmniDashboardEmbedder.md
       - omni.OmniFilterDefinition: api/OmniFilterDefinition.md
       - omni.OmniFilterSet: api/OmniFilterSet.md
+    - API Client:
+      - omni.OmniApiClient: api/OmniApiClient.md
