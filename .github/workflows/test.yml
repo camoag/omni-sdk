@@ -21,7 +21,6 @@ jobs:
       - run: pip install poetry
       - run: poetry install --with dev
       - run: poetry run mypy src/
-      - run: cd tests
-      - run: poetry run pytest --cov=omni
+      - run: cd tests; poetry run pytest --cov=omni
 
 
