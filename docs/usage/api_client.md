@@ -2,7 +2,7 @@ The Omni SDK includes an easy-to-use REST API client that provides high-level me
 methods for making requests directly to the REST endpoints.
 
 ## Creating the client
-Configuration of the client can be hanled using kwargs or environment variables. Examples of both are below.
+Configuration of the client can be handled using kwargs or environment variables. Examples of both are below.
 
 ```python  title="Kwarg Configuration"
 from omni import OmniApiClient
@@ -40,7 +40,7 @@ Below you'll find instructions on how to use the low-level methods to interact d
 
 ### GET, POST, PUT, DELETE
 There are methods available for making RESTful requests without having to deal with configuring the base url or 
-authentication. The `path` argument for these methods should be the url path following but including `api/`
+authentication. The `path` argument for these methods should be the url path starting from `http://<OMNI_DOMAIN>/api`
 
 ```python title="RESTful Requests"
 

@@ -40,17 +40,43 @@ class DashboardEmbedUrl:
 
 
 class OmniDashboardEmbedder:
-    """Factory class that can build dashboard embedding URLs. The class can be instantiated with the Omni
-    domain (organization_name or vanity_domain) and embed_secret or if either of the kwargs are omitted their values will be pulled from the
-    environment variables (OMNI_ORGANIZATION_NAME or OMNI_VANITY_DOMAIN) and OMNI_EMBED_SECRET.
+    """Factory class for building and signing dashboard embedding URLs.
+
+    Args:
+        organization_name: organization_name: Omni organization name. OMNI_ORGANIZATION_NAME environment variable will
+            be used as a fallback.
+        embed_secret: Omni embed secret. OMNI_EMBED_SECRET environment variable will be used as a fallback.
+        vanity_domain: Vanity domain configured with Omni. Should not be fully qualified. OMNI_VANITY_DOMAIN
+            environment variable will be used as a fallback.
+
+    Attributes:
+        embed_login_url: Base url of embedded dashboard urls.
+        embed_secret: Omni embed secret.
     """
 
     class PrefersDark(Enum):
+        """PrefersDark options
+
+        Attributes:
+            yes: true
+            no: false
+            system: system
+        """
+
         yes = "true"
         no = "false"
         system = "system"
 
     class Theme(Enum):
+        """Theme options
+
+        Attributes:
+            dawn: dawn
+            vibes: vibes
+            breeze: breeze
+            blank: blank
+        """
+
         dawn = "dawn"
         vibes = "vibes"
         breeze = "breeze"
@@ -99,6 +125,29 @@ class OmniDashboardEmbedder:
     ) -> str:
         """Builds a signed dashboard embedding URL. For more information on the options see the [Omni Docs](
         https://docs.omni.co/docs/embed/private-embedding#embed-url-customization-options)
+
+        Args:
+            content_path: Path pointing to the dashboard you wish to build a URL to embed.
+            external_id: Required parameter creating a unique ID. This can be any alphanumeric value.
+            name: Required parameter and can contain a non-unique name for the embed user's name property.
+            custom_theme: Allows you to stylize your embedded dashboard to your preferred colors.
+            entity: An id to reference the entity the user belongs to. Commonly is the customer name or other
+                identifying organization for this user.
+            filter_search_params: Encoded string or a dict representing dashboard filter values . This can be derived
+                by copying the substring after the "?" from a dashboard URL with non-empty filter values or using the
+                `OmniFilterSet` helper class.
+            link_access: Allows you to customize which other Omni dashboards can be linked to from the embedded dashboard.
+                If set to True, all links on the embedded dashboard are permissed and shown. Alternatively, a list of
+                dashboard IDs can be passed (i.e. ["abcd1234", "efgh5678", "ijkl9999"]) to only permiss to specific
+                dashboard IDs. Finally, if the parameter is None, all links to other Omni dashboards are
+                restricted. Note that link URLs to anything other than an Omni Dashboard will be shown and permissed
+                regardless of the linkAccess parameter.
+            prefers_dark: Dark mode setting.
+            theme: Visual theming options.
+            user_attributes: Dictionary of attributes matching defined user attributes in your Omni account.
+
+        Returns:
+            : Signed dashboard embedding URL.
         """
 
         # Preprocess some values before passing to URL object.
@@ -169,10 +218,39 @@ class OmniDashboardEmbedder:
 
 @dataclass
 class OmniFilterDefinition:
+    """Defines an Omni dashboard filter. Used to populate an OmniFilterSet and generate the filter search params
+    for an embedded dashboard URL.
+
+    Args:
+        field: Name of the Omni field a filter exists for. Generally a dot-path representing a dimension in a view.
+        type: Type of the value to be filtered on.
+        operator: Type of filter operation to perform.
+
+    Attributes:
+        field: Name of the Omni field a filter exists for. Generally a dot-path representing a dimension in a view.
+        type: Type of the value to be filtered on.
+        operator: Type of filter operation to perform.
+
+    """
+
     class Type(Enum):
+        """Omni Filter Type Options
+
+        Attributes:
+            number: number
+        """
+
         number = "number"
 
     class Operator(Enum):
+        """Omni Filter Operator Options
+
+        Attributes:
+            equals: EQUALS
+            less_than: LESS_THAN
+            greater_than: GREATER_THAN
+        """
+
         equals = "EQUALS"
         less_than = "LESS_THAN"
         greater_than = "GREATER_THAN"
@@ -184,7 +262,14 @@ class OmniFilterDefinition:
     def get_filter_search_param_info(
         self, values: str | int | float | list[str | int | float]
     ) -> tuple[str, list[str]]:
-        """Returns the key and value to be used in a query string for an Omni Dashboard."""
+        """Returns the key and value to be used in a query string for an Omni Dashboard.
+
+        Args:
+            values: Value or list of values to filter on.
+
+        Returns:
+            : Key and value to use in the filter search params when building an embedded dashboard URL.
+        """
         if not isinstance(values, list):
             values = [values]
         filter_key = f"f--{self.field}"
@@ -206,6 +291,12 @@ class OmniFilterSet:
     """Helper class for generating a set of filter search parameters for an embedded dashboard. This class is designed
     to abstract the complexity of the Omni filters and create a simple interface for generating the filter values to
     be used by the OmniDashboardEmbedder.
+
+    Args:
+        **filters: Arbitrary kwargs defining filter definitions. The kwarg is the name of the filter and defines the
+            schema for the dict that should be passed to the get_filter_search_params method. The value for each kwarg is
+            the OmniFilterDefinition object that will be used to translate the value to a viable Omni filter search param.
+
     """
 
     def __init__(self, **filters: OmniFilterDefinition) -> None:
@@ -216,7 +307,9 @@ class OmniFilterSet:
 
     @property
     def filters(self) -> dict[str, OmniFilterDefinition]:
-        """Returns the dictionary of filters used to create this OmniFilterSet."""
+        """Filters in this filter set. This defines the schema of the dict that should be passed to the
+        `get_filter_search_params` method.
+        """
         # Using a property function here to discourage manipulating filters after instantiation.
         return self._filters
 
@@ -226,6 +319,13 @@ class OmniFilterSet:
         """Given a dictionary of filter keys and values this function returns the dictionary of expected to populate
         the filter_search_params kwarg when calling OmniDashboardEmbedder.build_url. This method is ideal for
         translating query params in the encapsulating application to Omni filter search parameters.
+
+        Args:
+            filter_values: Dict where the keys are the filter names and values are the values to filter on. The
+                list of available filters can be found in the `filters` property.
+
+        Returns:
+            : Dict to be passed as the `filter_search_params` kwarg in the `OmniDashboardEmbedder.build_url` method.
         """
         filter_search_params = {}
         for query_param, value in filter_values.items():
