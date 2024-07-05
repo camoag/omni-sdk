@@ -3,7 +3,7 @@ requires = ["hatchling", "requests"]
 build-backend = "hatchling.build"
 
 [project]
-name = "omni"
+name = "omni-analytics-sdk"
 version = "0.2.0-alpha"
 authors = [
   { name="Daniel Tiesling", email="daniel.tiesling@camo.ag" },
@@ -17,8 +17,14 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
+    "python >= 3.9",
     "requests"
 ]
+
+[project.urls]
+"Homepage" = "https://tillable.github.io/omni-sdk/stable/"
+"Repository" = "https://github.com/tillable/omni-sdk"
+"Documentation" = "https://tillable.github.io/omni-sdk/stable/"
 
 [tool]
 [tool.hatch.version]
