@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0-alpha](https://github.com/tillable/omni-sdk/compare/v0.2.0-alpha...v0.3.0-alpha) (2024-07-03)
+
+
+### Features
+
+* adds REST client with low level request methods and high level method to refresh models. ([#13](https://github.com/tillable/omni-sdk/issues/13)) ([cf45a30](https://github.com/tillable/omni-sdk/commit/cf45a308443e7544a85d388f56cb56043b831a8e))
+
+
+### Documentation
+
+* add spra85 as a contributor for doc, and code ([#18](https://github.com/tillable/omni-sdk/issues/18)) ([51392f9](https://github.com/tillable/omni-sdk/commit/51392f9147a467949e40c7d8b2464fdf91e85e03))
+
 ## [0.2.0-alpha](https://github.com/tillable/omni-sdk/compare/v0.1.1-alpha...v0.2.0-alpha) (2024-07-01)
 
 
