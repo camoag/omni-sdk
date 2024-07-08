@@ -3,7 +3,7 @@ requires = ["hatchling", "requests"]
 build-backend = "hatchling.build"
 
 [project]
-name = "omni"
+name = "omni-analytics-sdk"
 version = "0.3.0-alpha"
 
 authors = [
@@ -35,7 +35,7 @@ path = "src/omni/__init__.py"
 packages = ["src/omni"]
 
 [tool.poetry]
-name = "omni"
+name = "omni-analytics-sdk"
 description = "Omni Analytics Python SDK."
 version = "0.1.0"
 authors = ["Daniel Tiesling <daniel.tiesling@camo.ag>"]
