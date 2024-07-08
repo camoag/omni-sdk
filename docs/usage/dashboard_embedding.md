@@ -74,7 +74,7 @@ set up, you can instantiate the OmniDashboardEmbedder with it to generate the co
 
 !!! note
     Support for dynamically generating filter search parameters is in early development and currently supports a 
-limited set of filtering options. If you need specific filters that are not yet available, please create an issue.
+    limited set of filtering options. If you need specific filters that are not yet available, please create an issue.
 
 Omni dashboard embedding allows passing filter values in the query string for the embedded dashboard. These filters are 
 represented as complex JSON-encoded strings. If the filter values you want to set are static, you can simply copy the 
