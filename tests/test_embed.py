@@ -2,6 +2,7 @@ import pytest
 
 from omni import OmniDashboardEmbedder
 from omni.config import OmniConfigError
+from omni.embed import OmniFilterDefinition, OmniFilterSet
 
 
 @pytest.fixture
@@ -202,3 +203,86 @@ class TestUnit:
         monkeypatch.setenv("OMNI_EMBED_SECRET", "super_secret")
         embedder = OmniDashboardEmbedder()
         assert embedder.embed_login_url == "https://foo.example.com/embed/login"
+
+
+class TestFilters:
+
+    @pytest.mark.parametrize(
+        "filter_type,operator,value,expected",
+        [
+            (
+                OmniFilterDefinition.Type.number,
+                OmniFilterDefinition.Operator.equals,
+                10,
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [10]}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.number,
+                OmniFilterDefinition.Operator.greater_than,
+                10,
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_inclusive": false, "is_negative": false, "kind": "GREATER_THAN", "type": "number", "values": [10]}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.number,
+                OmniFilterDefinition.Operator.less_than,
+                10,
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_inclusive": false, "is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10]}'
+                    ],
+                ),
+            ),
+        ],
+    )
+    def test_filters(self, filter_type, operator, value, expected):
+        filter = OmniFilterDefinition(
+            field="some.attr",
+            type=filter_type,
+            operator=operator,
+        )
+        assert filter.get_filter_search_param_info(value) == expected
+
+    def test_bad_filters_in_filter_set(self):
+        with pytest.raises(TypeError):
+            OmniFilterSet(fail="nope")
+
+    def test_filter_set(self):
+        filter_set = OmniFilterSet(
+            latitude=OmniFilterDefinition(
+                field="address.latitude_filter",
+                type=OmniFilterDefinition.Type.number,
+            ),
+            longitude=OmniFilterDefinition(
+                field="address.longitude_filter",
+                type=OmniFilterDefinition.Type.number,
+            ),
+            distance=OmniFilterDefinition(
+                field="address.distance_selected_to_address_in_miles",
+                type=OmniFilterDefinition.Type.number,
+                operator=OmniFilterDefinition.Operator.less_than,
+            ),
+        )
+        assert filter_set.get_filter_search_params(
+            {"latitude": 33.555, "longitude": -117.602, "distance": 10}
+        ) == {
+            "f--address.distance_selected_to_address_in_miles": [
+                '{"is_inclusive": false, "is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10]}'
+            ],
+            "f--address.latitude_filter": [
+                '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [33.555]}'
+            ],
+            "f--address.longitude_filter": [
+                '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [-117.602]}'
+            ],
+        }
