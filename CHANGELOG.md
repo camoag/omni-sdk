@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.0](https://github.com/camoag/omni-sdk/compare/v0.3.0-alpha...v1.0.0) (2024-07-10)
+
+
+### Features
+
+* adds helper classes for passing filter search params in embedded dashboards. ([#21](https://github.com/camoag/omni-sdk/issues/21)) ([5147dba](https://github.com/camoag/omni-sdk/commit/5147dba3fa51394e438ce6903a9baaa87f4d2278))
+
+
+### Miscellaneous Chores
+
+* release 1.0.0 ([5e495ad](https://github.com/camoag/omni-sdk/commit/5e495add0d01b0e5d5503dd756b96ea50012de87))
+
 ## [0.3.0-alpha](https://github.com/tillable/omni-sdk/compare/v0.2.0-alpha...v0.3.0-alpha) (2024-07-03)
 
 
