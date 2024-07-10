@@ -4,7 +4,6 @@ on: push
 
 env:
   HATCH_INDEX_AUTH: ${{ secrets.HATCH_INDEX_AUTH }}
-  HATCH_INDEX_USER: ${{ secrets.HATCH_INDEX_USER }}
 
 jobs:
   publish:
@@ -21,4 +20,4 @@ jobs:
       - name: Publish to Pypi
         run: |
           hatch build
-          hatch publish -n
+          hatch publish -n -u __token__
