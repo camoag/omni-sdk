@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/camoag/omni-sdk/compare/v1.0.0...v1.0.1) (2024-07-11)
+
+
+### Bug Fixes
+
+* bug in dependencies preventing pypi installs. ([#27](https://github.com/camoag/omni-sdk/issues/27)) ([e688d92](https://github.com/camoag/omni-sdk/commit/e688d923dbc04c3c2e9f41d9fb790bca8e8c9e4e))
+* updated git org name to proper home ([#26](https://github.com/camoag/omni-sdk/issues/26)) ([98fd413](https://github.com/camoag/omni-sdk/commit/98fd4131a844c3c7805afff721152f993e2a3e1f))
+
 ## [1.0.0](https://github.com/camoag/omni-sdk/compare/v0.3.0-alpha...v1.0.0) (2024-07-10)
 
 
