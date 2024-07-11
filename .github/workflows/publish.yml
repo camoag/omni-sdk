@@ -1,9 +1,6 @@
 name: Pypi Publish
 
-on:
-  release:
-    types:
-      - published
+on: release
 
 env:
   HATCH_INDEX_AUTH: ${{ secrets.HATCH_INDEX_AUTH }}
@@ -23,4 +20,4 @@ jobs:
       - name: Publish to Pypi
         run: |
           hatch build
-          hatch publish -r test -n
+          hatch publish -n -u __token__

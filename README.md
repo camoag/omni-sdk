@@ -1,26 +1,26 @@
-[![CI Testing](https://github.com/tillable/omni-sdk/actions/workflows/test.yml/badge.svg)](https://github.com/tillable/omni-sdk/actions/workflows/test.yml)
+[![CI Testing](https://github.com/camoag/omni-sdk/actions/workflows/test.yml/badge.svg)](https://github.com/camoag/omni-sdk/actions/workflows/test.yml)
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License - MIT](https://img.shields.io/badge/license-MIT-9400d3.svg)](https://spdx.org/licenses/)
 [![types - Mypy](https://img.shields.io/badge/types-Mypy-blue.svg)](https://github.com/python/mypy)
 
-# Omni SDK 
+# Omni SDK
 
 **Unofficial  SDK for [Omni Analytics](https://omni.co/)**
 
 ## Getting Started
 
-For installation, configuration and usage view the docs [here](https://tillable.github.io/omni-sdk//#getting-started)
+For installation, configuration and usage view the docs [here](https://camoag.github.io/omni-sdk//#getting-started)
 
 ## Bug Reports
 
-Submit any issues you may encounter as a  [GitHub issue](https://github.com/tillable/omni-sdk/issues). Please search for 
+Submit any issues you may encounter as a  [GitHub issue](https://github.com/camoag/omni-sdk/issues). Please search for
 similar issues before submitting a new one.
 
 ## Questions, Concerns, Ideas, Support, Feature Requests
 
 All non-bug-related discussions such as support or feature requests should be submitted as a
-[GitHub Discussion](https://github.com/tillable/omni-sdk/discussions). 
+[GitHub Discussion](https://github.com/camoag/omni-sdk/discussions).
 
 ## License
 
@@ -32,7 +32,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ### Development Environment
 
-The development environment is simple and straightforward. Dependencies are managed by Poetry and tests are run 
+The development environment is simple and straightforward. Dependencies are managed by Poetry and tests are run
 with pytest. If you would like to test any changes against a live server you can use any apps in the `/examples` directory.
 
 Prerequisites:
@@ -79,8 +79,8 @@ Other conventional commits such as `chore`, `ci`, `test`, `refactor`, etc will n
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dtiesling"><img src="https://avatars.githubusercontent.com/u/7133255?v=4?s=100" width="100px;" alt="Danny Tiesling"/><br /><sub><b>Danny Tiesling</b></sub></a><br /><a href="https://github.com/tillable/omni-sdk/commits?author=dtiesling" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/spra85"><img src="https://avatars.githubusercontent.com/u/423943?v=4?s=100" width="100px;" alt="Chris Sprehe"/><br /><sub><b>Chris Sprehe</b></sub></a><br /><a href="https://github.com/tillable/omni-sdk/commits?author=spra85" title="Documentation">📖</a> <a href="https://github.com/tillable/omni-sdk/commits?author=spra85" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dtiesling"><img src="https://avatars.githubusercontent.com/u/7133255?v=4?s=100" width="100px;" alt="Danny Tiesling"/><br /><sub><b>Danny Tiesling</b></sub></a><br /><a href="https://github.com/camoag/omni-sdk/commits?author=dtiesling" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/spra85"><img src="https://avatars.githubusercontent.com/u/423943?v=4?s=100" width="100px;" alt="Chris Sprehe"/><br /><sub><b>Chris Sprehe</b></sub></a><br /><a href="https://github.com/camoag/omni-sdk/commits?author=spra85" title="Documentation">📖</a> <a href="https://github.com/camoag/omni-sdk/commits?author=spra85" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

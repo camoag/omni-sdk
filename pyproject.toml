@@ -22,9 +22,9 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://tillable.github.io/omni-sdk/stable/"
-"Repository" = "https://github.com/tillable/omni-sdk"
-"Documentation" = "https://tillable.github.io/omni-sdk/stable/"
+"Homepage" = "https://camoag.github.io/omni-sdk/stable/"
+"Repository" = "https://github.com/camoag/omni-sdk"
+"Documentation" = "https://camoag.github.io/omni-sdk/stable/"
 
 [tool]
 [tool.hatch.version]
