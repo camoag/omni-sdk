@@ -18,7 +18,6 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "python >= 3.9",
     "requests"
 ]
 
@@ -35,7 +34,7 @@ path = "src/omni/__init__.py"
 packages = ["src/omni"]
 
 [tool.poetry]
-name = "omni-analytics-sdk"
+name = "omni"
 description = "Omni Analytics Python SDK."
 version = "0.1.0"
 authors = ["Daniel Tiesling <daniel.tiesling@camo.ag>"]
