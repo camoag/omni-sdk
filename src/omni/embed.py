@@ -241,6 +241,7 @@ class OmniFilterDefinition:
         """
 
         number = "number"
+        string = "string"
 
     class Operator(Enum):
         """Omni Filter Operator Options
@@ -254,10 +255,17 @@ class OmniFilterDefinition:
         equals = "EQUALS"
         less_than = "LESS_THAN"
         greater_than = "GREATER_THAN"
+        less_than_or_equal = "LESS_THAN_OR_EQUAL"
+        greater_than_or_equal = "GREATER_THAN_OR_EQUAL"
+        contains = "CONTAINS"
+        between = "BETWEEN"
+        starts_with = "STARTS_WITH"
+        ends_with = "ENDS_WITH"
 
     field: str
     type: Type
     operator: Operator = Operator.equals
+    is_negative: bool = False
 
     def get_filter_search_param_info(
         self, values: str | int | float | list[str | int | float]
@@ -273,17 +281,36 @@ class OmniFilterDefinition:
         if not isinstance(values, list):
             values = [values]
         filter_key = f"f--{self.field}"
-        filter_value = [
-            json.dumps(
-                {
-                    "is_inclusive": False,  # FUTURE: Set this dynamically if needed for future operators.
-                    "is_negative": False,
-                    "kind": self.operator.value,
-                    "type": self.type.value,
-                    "values": values,
-                }
-            )
-        ]
+
+        is_inclusive = False
+
+        operator_kind = self.operator.value
+
+        if self.operator == self.Operator.greater_than_or_equal:
+            is_inclusive = True
+            operator_kind = self.Operator.greater_than.value
+        elif self.operator == self.Operator.less_than_or_equal:
+            is_inclusive = True
+            operator_kind = self.Operator.less_than.value
+
+        filter_value_param = (
+            {
+                "is_inclusive": is_inclusive,
+                "is_negative": self.is_negative,
+                "kind": operator_kind,
+                "type": self.type.value,
+                "values": values,
+            }
+            if self.type == self.Type.number
+            else {
+                "is_negative": self.is_negative,
+                "kind": operator_kind,
+                "type": self.type.value,
+                "values": values,
+            }
+        )
+
+        filter_value = [json.dumps(filter_value_param)]
         return filter_key, filter_value
 
 
