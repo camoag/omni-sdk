@@ -300,22 +300,15 @@ class OmniFilterDefinition:
             is_inclusive = True
             operator_kind = self.Operator.less_than.value
 
-        filter_value_param = (
-            {
-                "is_inclusive": is_inclusive,
-                "is_negative": self.is_negative,
-                "kind": operator_kind,
-                "type": self.type.value,
-                "values": values,
-            }
-            if self.type == self.Type.number
-            else {
-                "is_negative": self.is_negative,
-                "kind": operator_kind,
-                "type": self.type.value,
-                "values": values,
-            }
-        )
+        filter_value_param = {
+            "is_negative": self.is_negative,
+            "kind": operator_kind,
+            "type": self.type.value,
+            "values": values,
+        }
+
+        if self.type == self.Type.number:
+            filter_value_param["is_inclusive"] = is_inclusive
 
         filter_value = [json.dumps(filter_value_param)]
         return filter_key, filter_value

@@ -218,7 +218,7 @@ class TestFilters:
                 (
                     "f--some.attr",
                     [
-                        '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [10]}'
+                        '{"is_negative": false, "kind": "EQUALS", "type": "number", "values": [10], "is_inclusive": false}'
                     ],
                 ),
             ),
@@ -230,7 +230,7 @@ class TestFilters:
                 (
                     "f--some.attr",
                     [
-                        '{"is_inclusive": false, "is_negative": false, "kind": "GREATER_THAN", "type": "number", "values": [10]}'
+                        '{"is_negative": false, "kind": "GREATER_THAN", "type": "number", "values": [10], "is_inclusive": false}'
                     ],
                 ),
             ),
@@ -242,7 +242,7 @@ class TestFilters:
                 (
                     "f--some.attr",
                     [
-                        '{"is_inclusive": false, "is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10]}'
+                        '{"is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10], "is_inclusive": false}'
                     ],
                 ),
             ),
@@ -254,7 +254,7 @@ class TestFilters:
                 (
                     "f--some.attr",
                     [
-                        '{"is_inclusive": true, "is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10]}'
+                        '{"is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10], "is_inclusive": true}'
                     ],
                 ),
             ),
@@ -266,7 +266,7 @@ class TestFilters:
                 (
                     "f--some.attr",
                     [
-                        '{"is_inclusive": true, "is_negative": false, "kind": "GREATER_THAN", "type": "number", "values": [10]}'
+                        '{"is_negative": false, "kind": "GREATER_THAN", "type": "number", "values": [10], "is_inclusive": true}'
                     ],
                 ),
             ),
@@ -278,7 +278,7 @@ class TestFilters:
                 (
                     "f--some.attr",
                     [
-                        '{"is_inclusive": false, "is_negative": false, "kind": "BETWEEN", "type": "number", "values": [10, 25]}'
+                        '{"is_negative": false, "kind": "BETWEEN", "type": "number", "values": [10, 25], "is_inclusive": false}'
                     ],
                 ),
             ),
@@ -378,12 +378,12 @@ class TestFilters:
             {"latitude": 33.555, "longitude": -117.602, "distance": 10}
         ) == {
             "f--address.distance_selected_to_address_in_miles": [
-                '{"is_inclusive": false, "is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10]}'
+                '{"is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10], "is_inclusive": false}'
             ],
             "f--address.latitude_filter": [
-                '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [33.555]}'
+                '{"is_negative": false, "kind": "EQUALS", "type": "number", "values": [33.555], "is_inclusive": false}'
             ],
             "f--address.longitude_filter": [
-                '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [-117.602]}'
+                '{"is_negative": false, "kind": "EQUALS", "type": "number", "values": [-117.602], "is_inclusive": false}'
             ],
         }
