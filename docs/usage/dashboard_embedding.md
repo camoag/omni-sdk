@@ -3,7 +3,7 @@ For more information on the options see the [Omni Docs](https://docs.omni.co/doc
 
 ## Creating the embedder
 Configuration of the client can be handled using kwargs or environment variables. There is also the option to create
-the embedder using your organization name or a vanity domain, more info on these options is below.  
+the embedder using your organization name or a vanity domain, more info on these options is below.
 
 ```python title="Kwarg Configuration - Organization Name"
 from omni import OmniDashboardEmbedder
@@ -41,7 +41,7 @@ embedder = OmniDashboardEmbedder()
 ```
 
 ## Generating a dashboard embedding URL.
-The embedder object has a single method that generates an embedding url and signs it. For more information on the 
+The embedder object has a single method that generates an embedding url and signs it. For more information on the
 options available please see the [API Documentation](../api/OmniDashboardEmbedder.md#omni.OmniDashboardEmbedder.build_url) for the class.
 
 ```python
@@ -62,32 +62,32 @@ url = embedder.build_url(
 )
 ```
 
-## Organization Name vs. Vanity Domain 
+## Organization Name vs. Vanity Domain
 
-The OmniDashboardEmbedder can be instantiated using either the `organization_name` or `vanity_domain` kwargs. 
-Instantiating with `organization_name` uses the standard Omni endpoint for the embedded dashboard URL. Alternatively, 
-Omni supports configuring a vanity domain to host embedded dashboards. You can learn about its advantages and setup 
-instructions [here](https://docs.omni.co/docs/embed/private-embedding#use-a-vanity-domain). Once your vanity domain is 
+The OmniDashboardEmbedder can be instantiated using either the `organization_name` or `vanity_domain` kwargs.
+Instantiating with `organization_name` uses the standard Omni endpoint for the embedded dashboard URL. Alternatively,
+Omni supports configuring a vanity domain to host embedded dashboards. You can learn about its advantages and setup
+instructions [here](https://docs.omni.co/docs/embed/private-embedding#use-a-vanity-domain). Once your vanity domain is
 set up, you can instantiate the OmniDashboardEmbedder with it to generate the correct URLs.
 
 ## Generating Filter Search Params
 
 !!! note
-    Support for dynamically generating filter search parameters is in early development and currently supports a 
+    Support for dynamically generating filter search parameters is in early development and currently supports a
     limited set of filtering options. If you need specific filters that are not yet available, please create an issue.
 
-Omni dashboard embedding allows passing filter values in the query string for the embedded dashboard. These filters are 
-represented as complex JSON-encoded strings. If the filter values you want to set are static, you can simply copy the 
+Omni dashboard embedding allows passing filter values in the query string for the embedded dashboard. These filters are
+represented as complex JSON-encoded strings. If the filter values you want to set are static, you can simply copy the
 query string value from the example above.
 
-For dynamically generating filter sets, the SDK provides a helper class, `OmniFilterSet`. This class is designed to 
+For dynamically generating filter sets, the SDK provides a helper class, `OmniFilterSet`. This class is designed to
 translate simplified query string parameters from your application's requests into the correct Omni format.
 
 ### Example: Generating filter search params in a Flask API view
 
-The following example demonstrates how a Flask API view can generate a signed Omni embed URL. It defines a set of 
-filters and uses the query string arguments from the request to create the appropriate filter search parameters for the 
-embedded dashboard URL. Using the same names for the query string params and filter names in the `OmniFilterSet` 
+The following example demonstrates how a Flask API view can generate a signed Omni embed URL. It defines a set of
+filters and uses the query string arguments from the request to create the appropriate filter search parameters for the
+embedded dashboard URL. Using the same names for the query string params and filter names in the `OmniFilterSet`
 allows you to pass the Flask `requests.args` directly.
 
 ```python title="myapp/views.py"
@@ -132,7 +132,7 @@ def get_omni_dashboard_url():
 To define a filter you instantiate an instance of the `OmniFilterDefinition` class with 3 arguments – field, type, and
 operator.
 
-**`field`** 
+**`field`**
 
 - Name of the Omni field to be filtered. Generally a dot-path representing a dimension in a view.
 - You must have already created a filter for this field in the Omni dashboard to be embedded.
@@ -141,7 +141,7 @@ operator.
 
 - Value type of the filter.
 - Must pass an option from the OmniFilterDefinition.Type enum.
-- Currently supported types - `number`
+- Currently supported types - `number` and `string`
 
 
 **`operator`**
@@ -149,12 +149,24 @@ operator.
 - Type of filter operation to perform.
 - Defaults to EQUALS.
 - Must pass an option from the OmniFilterDefinition.Operator enum.
-- Currently supported operators - `equals`, `less_than`, `greater_than`
+- Currently supported operators - `equals`, `less_than`, `greater_than`, `greater_than_or_equal`, `less_than_or_equal`, `between`, `contains`, `starts_with`, `ends_with`
 
 
-In Omni, not all types support all operators. While there are no conflicts with the currently limited set of supported 
-types and operators, this may change as more are added. The matrix below shows the compatibility between types and operators.
+In Omni, not all types support all operators. While there are no conflicts with the currently limited set of supported
+types and operators, this may change as more are added.
 
-|         | equals | less_than | greater_than |
-|---------|--------|-----------|--------------|
-| number  | ✅      |     ✅      |       ✅       |
+The following types are supported for `number`:
+
+- ✅ Equals
+- ✅ Less than
+- ✅ Less than or equal
+- ✅ Greater than
+- ✅ Greater than or equal
+- ✅ Between
+
+The following types are supported for `string`:
+
+- ✅ Equals
+- ✅ Contains
+- ✅ Starts with
+- ✅ Ends with

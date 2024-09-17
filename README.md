@@ -49,6 +49,11 @@ Run tests.
 poetry run pytest
 ```
 
+Preview documentation.
+```bash
+poetry run mkdocs serve
+```
+
 ### Code Style
 
 - Code is formatted using [black](https://black.readthedocs.io/en/stable/).

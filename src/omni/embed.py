@@ -238,6 +238,7 @@ class OmniFilterDefinition:
 
         Attributes:
             number: number
+            string: string
         """
 
         number = "number"
@@ -250,6 +251,12 @@ class OmniFilterDefinition:
             equals: EQUALS
             less_than: LESS_THAN
             greater_than: GREATER_THAN
+            less_than_or_equal = LESS_THAN_OR_EQUAL
+            greater_than_or_equal = GREATER_THAN_OR_EQUAL
+            contains = CONTAINS
+            between = BETWEEN
+            starts_with = STARTS_WITH
+            ends_with = ENDS_WITH
         """
 
         equals = "EQUALS"
