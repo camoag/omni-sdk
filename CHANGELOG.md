@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/camoag/omni-sdk/compare/v1.0.1...v1.1.0) (2024-09-18)
+
+
+### Features
+
+* add support for 'string' filters and adds additional operator types ([#29](https://github.com/camoag/omni-sdk/issues/29)) ([1e832b5](https://github.com/camoag/omni-sdk/commit/1e832b59f96690e380a5c2ae0d5108d50280f4e3))
+
 ## [1.0.1](https://github.com/camoag/omni-sdk/compare/v1.0.0...v1.0.1) (2024-07-11)
 
 
