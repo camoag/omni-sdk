@@ -208,50 +208,151 @@ class TestUnit:
 class TestFilters:
 
     @pytest.mark.parametrize(
-        "filter_type,operator,value,expected",
+        "filter_type,operator,is_negative,values,expected",
         [
             (
                 OmniFilterDefinition.Type.number,
                 OmniFilterDefinition.Operator.equals,
+                False,
                 10,
                 (
                     "f--some.attr",
                     [
-                        '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [10]}'
+                        '{"is_negative": false, "kind": "EQUALS", "type": "number", "values": [10], "is_inclusive": false}'
                     ],
                 ),
             ),
             (
                 OmniFilterDefinition.Type.number,
                 OmniFilterDefinition.Operator.greater_than,
+                False,
                 10,
                 (
                     "f--some.attr",
                     [
-                        '{"is_inclusive": false, "is_negative": false, "kind": "GREATER_THAN", "type": "number", "values": [10]}'
+                        '{"is_negative": false, "kind": "GREATER_THAN", "type": "number", "values": [10], "is_inclusive": false}'
                     ],
                 ),
             ),
             (
                 OmniFilterDefinition.Type.number,
                 OmniFilterDefinition.Operator.less_than,
+                False,
                 10,
                 (
                     "f--some.attr",
                     [
-                        '{"is_inclusive": false, "is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10]}'
+                        '{"is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10], "is_inclusive": false}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.number,
+                OmniFilterDefinition.Operator.less_than_or_equal,
+                False,
+                10,
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10], "is_inclusive": true}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.number,
+                OmniFilterDefinition.Operator.greater_than_or_equal,
+                False,
+                10,
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_negative": false, "kind": "GREATER_THAN", "type": "number", "values": [10], "is_inclusive": true}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.number,
+                OmniFilterDefinition.Operator.between,
+                False,
+                [10, 25],
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_negative": false, "kind": "BETWEEN", "type": "number", "values": [10, 25], "is_inclusive": false}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.string,
+                OmniFilterDefinition.Operator.equals,
+                False,
+                "California",
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_negative": false, "kind": "EQUALS", "type": "string", "values": ["California"]}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.string,
+                OmniFilterDefinition.Operator.starts_with,
+                False,
+                "California",
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_negative": false, "kind": "STARTS_WITH", "type": "string", "values": ["California"]}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.string,
+                OmniFilterDefinition.Operator.ends_with,
+                True,
+                "California",
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_negative": true, "kind": "ENDS_WITH", "type": "string", "values": ["California"]}'
+                    ],
+                ),
+            ),
+            (
+                OmniFilterDefinition.Type.string,
+                OmniFilterDefinition.Operator.contains,
+                True,
+                "California",
+                (
+                    "f--some.attr",
+                    [
+                        '{"is_negative": true, "kind": "CONTAINS", "type": "string", "values": ["California"]}'
                     ],
                 ),
             ),
         ],
     )
-    def test_filters(self, filter_type, operator, value, expected):
+    def test_filters(self, filter_type, operator, is_negative, values, expected):
         filter = OmniFilterDefinition(
             field="some.attr",
             type=filter_type,
             operator=operator,
+            is_negative=is_negative,
         )
-        assert filter.get_filter_search_param_info(value) == expected
+        assert filter.get_filter_search_param_info(values) == expected
+
+    def test_filter_negative_not_required(self):
+        filter = OmniFilterDefinition(
+            field="some.attr",
+            type=OmniFilterDefinition.Type.string,
+            operator=OmniFilterDefinition.Operator.contains,
+        )
+        assert filter.get_filter_search_param_info("California") == (
+            "f--some.attr",
+            [
+                '{"is_negative": false, "kind": "CONTAINS", "type": "string", "values": ["California"]}'
+            ],
+        )
 
     def test_bad_filters_in_filter_set(self):
         with pytest.raises(TypeError):
@@ -277,12 +378,12 @@ class TestFilters:
             {"latitude": 33.555, "longitude": -117.602, "distance": 10}
         ) == {
             "f--address.distance_selected_to_address_in_miles": [
-                '{"is_inclusive": false, "is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10]}'
+                '{"is_negative": false, "kind": "LESS_THAN", "type": "number", "values": [10], "is_inclusive": false}'
             ],
             "f--address.latitude_filter": [
-                '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [33.555]}'
+                '{"is_negative": false, "kind": "EQUALS", "type": "number", "values": [33.555], "is_inclusive": false}'
             ],
             "f--address.longitude_filter": [
-                '{"is_inclusive": false, "is_negative": false, "kind": "EQUALS", "type": "number", "values": [-117.602]}'
+                '{"is_negative": false, "kind": "EQUALS", "type": "number", "values": [-117.602], "is_inclusive": false}'
             ],
         }
