@@ -21,6 +21,7 @@ class DashboardEmbedUrl:
     name: str
     nonce: str
     customTheme: str | None = None
+    connectionRoles: str | None = None
     entity: str | None = None
     filterSearchParam: str | None = None
     linkAccess: str | None = None
@@ -116,6 +117,7 @@ class OmniDashboardEmbedder:
         external_id: str,
         name: str,
         custom_theme: dict | None = None,
+        connection_roles: dict | None = None,
         entity: str | None = None,
         filter_search_params: str | dict | None = None,
         link_access: bool | list[str] | None = None,
@@ -131,6 +133,7 @@ class OmniDashboardEmbedder:
             external_id: Required parameter creating a unique ID. This can be any alphanumeric value.
             name: Required parameter and can contain a non-unique name for the embed user's name property.
             custom_theme: Allows you to stylize your embedded dashboard to your preferred colors.
+            connection_roles: Allows you to customize which connection roles the user has access to.
             entity: An id to reference the entity the user belongs to. Commonly is the customer name or other
                 identifying organization for this user.
             filter_search_params: Encoded string or a dict representing dashboard filter values . This can be derived
@@ -175,7 +178,10 @@ class OmniDashboardEmbedder:
             contentPath=content_path,
             externalId=external_id,
             name=name,
-            customTheme=compact_json_dump(custom_theme) if custom_theme else None,
+            customTheme=compact_json_dump(
+                custom_theme) if custom_theme else None,
+            connectionRoles=compact_json_dump(
+                connection_roles) if connection_roles else None,
             entity=entity,
             filterSearchParam=filter_search_params,
             linkAccess=_link_access,
@@ -200,6 +206,7 @@ class OmniDashboardEmbedder:
             url.externalId,
             url.name,
             url.nonce,
+            url.connectionRoles,
             url.customTheme,
             url.entity,
             url.filterSearchParam,
@@ -211,7 +218,8 @@ class OmniDashboardEmbedder:
 
         blob = "\n".join([i for i in blob_items if i is not None])
         hmac_hash = hmac.new(
-            self.embed_secret.encode("utf-8"), blob.encode("utf-8"), hashlib.sha256
+            self.embed_secret.encode(
+                "utf-8"), blob.encode("utf-8"), hashlib.sha256
         ).digest()
         url.signature = base64.urlsafe_b64encode(hmac_hash).decode("utf-8")
 
@@ -329,7 +337,8 @@ class OmniFilterSet:
     def __init__(self, **filters: OmniFilterDefinition) -> None:
         for value in filters.values():
             if not isinstance(value, OmniFilterDefinition):
-                raise TypeError("Filters must be an OmniFilterDefinition object.")
+                raise TypeError(
+                    "Filters must be an OmniFilterDefinition object.")
         self._filters = filters
 
     @property
@@ -357,6 +366,7 @@ class OmniFilterSet:
         filter_search_params = {}
         for query_param, value in filter_values.items():
             omni_filter = self.filters[query_param]
-            filter_key, filter_value = omni_filter.get_filter_search_param_info(value)
+            filter_key, filter_value = omni_filter.get_filter_search_param_info(
+                value)
             filter_search_params[filter_key] = filter_value
         return filter_search_params
