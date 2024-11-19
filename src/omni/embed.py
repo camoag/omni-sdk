@@ -20,8 +20,9 @@ class DashboardEmbedUrl:
     externalId: str
     name: str
     nonce: str
-    customTheme: str | None = None
+    accessBoost: bool | None = False
     connectionRoles: str | None = None
+    customTheme: str | None = None
     entity: str | None = None
     filterSearchParam: str | None = None
     linkAccess: str | None = None
@@ -116,8 +117,9 @@ class OmniDashboardEmbedder:
         content_path: str,
         external_id: str,
         name: str,
-        custom_theme: dict | None = None,
+        access_boost: bool | None = False,
         connection_roles: dict | None = None,
+        custom_theme: dict | None = None,
         entity: str | None = None,
         filter_search_params: str | dict | None = None,
         link_access: bool | list[str] | None = None,
@@ -133,7 +135,8 @@ class OmniDashboardEmbedder:
             external_id: Required parameter creating a unique ID. This can be any alphanumeric value.
             name: Required parameter and can contain a non-unique name for the embed user's name property.
             custom_theme: Allows you to stylize your embedded dashboard to your preferred colors.
-            connection_roles: Allows you to customize which connection roles the user has access to.
+            access_boost: Boolean setting to enable Access Boost for the embedded dashboard.
+            connection_roles: Required. Defines the connection roles available for embed users. Restricted queriers can create new content, Viewers can only consume dashboards.
             entity: An id to reference the entity the user belongs to. Commonly is the customer name or other
                 identifying organization for this user.
             filter_search_params: Encoded string or a dict representing dashboard filter values . This can be derived
@@ -178,10 +181,11 @@ class OmniDashboardEmbedder:
             contentPath=content_path,
             externalId=external_id,
             name=name,
-            customTheme=compact_json_dump(
-                custom_theme) if custom_theme else None,
+            accessBoost="true" if access_boost else "false",
             connectionRoles=compact_json_dump(
                 connection_roles) if connection_roles else None,
+            customTheme=compact_json_dump(
+                custom_theme) if custom_theme else None,
             entity=entity,
             filterSearchParam=filter_search_params,
             linkAccess=_link_access,
@@ -206,6 +210,7 @@ class OmniDashboardEmbedder:
             url.externalId,
             url.name,
             url.nonce,
+            url.accessBoost,
             url.connectionRoles,
             url.customTheme,
             url.entity,
@@ -215,7 +220,6 @@ class OmniDashboardEmbedder:
             url.theme,
             url.userAttributes,
         ]
-
         blob = "\n".join([i for i in blob_items if i is not None])
         hmac_hash = hmac.new(
             self.embed_secret.encode(
