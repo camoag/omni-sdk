@@ -20,7 +20,7 @@ class DashboardEmbedUrl:
     externalId: str
     name: str
     nonce: str
-    accessBoost: bool | None = False
+    accessBoost: bool | None = None
     connectionRoles: str | None = None
     customTheme: str | None = None
     entity: str | None = None
@@ -117,7 +117,7 @@ class OmniDashboardEmbedder:
         content_path: str,
         external_id: str,
         name: str,
-        access_boost: bool | None = False,
+        access_boost: bool | None = None,
         connection_roles: dict | None = None,
         custom_theme: dict | None = None,
         entity: str | None = None,
@@ -181,7 +181,7 @@ class OmniDashboardEmbedder:
             contentPath=content_path,
             externalId=external_id,
             name=name,
-            accessBoost="true" if access_boost else "false",
+            accessBoost="true" if access_boost else None,
             connectionRoles=compact_json_dump(
                 connection_roles) if connection_roles else None,
             customTheme=compact_json_dump(
@@ -196,6 +196,7 @@ class OmniDashboardEmbedder:
             ),
             nonce=uuid.uuid4().hex,
         )
+
         self._sign_url(url)
         return str(url)
 
