@@ -46,6 +46,7 @@ poetry install
 
 Run tests.
 ```bash
+cd tests
 poetry run pytest
 ```
 
@@ -86,6 +87,7 @@ Other conventional commits such as `chore`, `ci`, `test`, `refactor`, etc will n
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/dtiesling"><img src="https://avatars.githubusercontent.com/u/7133255?v=4?s=100" width="100px;" alt="Danny Tiesling"/><br /><sub><b>Danny Tiesling</b></sub></a><br /><a href="https://github.com/camoag/omni-sdk/commits?author=dtiesling" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/spra85"><img src="https://avatars.githubusercontent.com/u/423943?v=4?s=100" width="100px;" alt="Chris Sprehe"/><br /><sub><b>Chris Sprehe</b></sub></a><br /><a href="https://github.com/camoag/omni-sdk/commits?author=spra85" title="Documentation">📖</a> <a href="https://github.com/camoag/omni-sdk/commits?author=spra85" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/wvdlTillable"><img src="https://avatars.githubusercontent.com/u/109123517?v=4" width="100px;" alt="Chris Sprehe"/><br /><sub><b>Bill Van Der Laan</b></sub></a><br /><a href="https://github.com/camoag/omni-sdk/commits?author=wvdlTillable" title="Documentation">📖</a> <a href="https://github.com/camoag/omni-sdk/commits?author=wvdlTillable" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

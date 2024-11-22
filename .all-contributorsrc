@@ -25,6 +25,15 @@
         "doc",
         "code"
       ]
+    },
+    {
+      "login": "wvdlTillable",
+      "name": "Bill Van Der Laan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/109123517?v=4",
+      "profile": "https://github.com/wvdlTillable",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
