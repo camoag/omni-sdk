@@ -21,6 +21,7 @@ class DashboardEmbedUrl:
     name: str
     nonce: str
     customTheme: str | None = None
+    email: str | None = None
     entity: str | None = None
     filterSearchParam: str | None = None
     linkAccess: str | None = None
@@ -116,6 +117,7 @@ class OmniDashboardEmbedder:
         external_id: str,
         name: str,
         custom_theme: dict | None = None,
+        email: str | None = None,
         entity: str | None = None,
         filter_search_params: str | dict | None = None,
         link_access: bool | list[str] | None = None,
@@ -131,6 +133,7 @@ class OmniDashboardEmbedder:
             external_id: Required parameter creating a unique ID. This can be any alphanumeric value.
             name: Required parameter and can contain a non-unique name for the embed user's name property.
             custom_theme: Allows you to stylize your embedded dashboard to your preferred colors.
+            email: Optional parameter with the user's email.
             entity: An id to reference the entity the user belongs to. Commonly is the customer name or other
                 identifying organization for this user.
             filter_search_params: Encoded string or a dict representing dashboard filter values . This can be derived
@@ -176,6 +179,7 @@ class OmniDashboardEmbedder:
             externalId=external_id,
             name=name,
             customTheme=compact_json_dump(custom_theme) if custom_theme else None,
+            email=email,
             entity=entity,
             filterSearchParam=filter_search_params,
             linkAccess=_link_access,
@@ -193,7 +197,7 @@ class OmniDashboardEmbedder:
         """Creates a signature and adds it to the URL object."""
 
         # IMPORTANT: These must be in the correct order as documented here
-        # https://docs.omni.co/docs/embed/private-embedding#manually-generate-a-signature-and-url-hard-mode
+        # https://docs.omni.co/docs/embed/external-embedding/setting-up-the-infrastructure#manually-generate-a-signature-and-url-hard-mode
         blob_items = [
             url.base_url,
             url.contentPath,
@@ -201,6 +205,7 @@ class OmniDashboardEmbedder:
             url.name,
             url.nonce,
             url.customTheme,
+            url.email,
             url.entity,
             url.filterSearchParam,
             url.linkAccess,

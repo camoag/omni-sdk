@@ -53,6 +53,7 @@ class TestUnit:
                 "dashboard-background": "#00FF00",
                 "dashboard-tile-background": "#00FF00",
             },
+            email="somebody@example.com",
             entity="Acme",
             filter_search_params={"state": "GA"},
             link_access=True,
@@ -67,13 +68,14 @@ class TestUnit:
             "&name=Somebody"
             "&nonce=365f7003aa5b4f3586d9b81b4a5d9f69"
             "&customTheme=%7B%22dashboard-background%22%3A%22%2300FF00%22%2C%22dashboard-tile-background%22%3A%22%2300FF00%22%7D"
+            "&email=somebody%40example.com"
             "&entity=Acme"
             "&filterSearchParam=state%3DGA"
             "&linkAccess=__omni_link_access_open"
             "&prefersDark=true"
             "&theme=dawn"
             "&userAttributes=%7B%22country%22%3A%22USA%22%7D"
-            "&signature=Y8Alg2Sfdi5WdbwzU4QEugs3HdwLfEvXuBv8UU3BBZw%3D"
+            "&signature=hgchoLoFN3y3cXe4gJXSrInXdAqMcdcOyT6xVRaU2WU%3D"
         )
 
         url = vanity_domain_embedder.build_url(
