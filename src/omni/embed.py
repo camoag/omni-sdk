@@ -25,6 +25,7 @@ class DashboardEmbedUrl:
     customTheme: str | None = None
     entity: str | None = None
     filterSearchParam: str | None = None
+    groups: str | None = None
     linkAccess: str | None = None
     prefersDark: str | None = None
     theme: str | None = None
@@ -122,6 +123,7 @@ class OmniDashboardEmbedder:
         custom_theme: dict | None = None,
         entity: str | None = None,
         filter_search_params: str | dict | None = None,
+        groups: list[str] | None = None,
         link_access: bool | list[str] | None = None,
         prefers_dark: PrefersDark | None = None,
         theme: Theme | None = None,
@@ -142,6 +144,7 @@ class OmniDashboardEmbedder:
             filter_search_params: Encoded string or a dict representing dashboard filter values . This can be derived
                 by copying the substring after the "?" from a dashboard URL with non-empty filter values or using the
                 `OmniFilterSet` helper class.
+            groups: An array of group names that allows you to associate the resulting embed user with existing groups on your Omni instance.
             link_access: Allows you to customize which other Omni dashboards can be linked to from the embedded dashboard.
                 If set to True, all links on the embedded dashboard are permissed and shown. Alternatively, a list of
                 dashboard IDs can be passed (i.e. ["abcd1234", "efgh5678", "ijkl9999"]) to only permiss to specific
@@ -188,6 +191,7 @@ class OmniDashboardEmbedder:
                 custom_theme) if custom_theme else None,
             entity=entity,
             filterSearchParam=filter_search_params,
+            groups=compact_json_dump(groups) if groups else None,
             linkAccess=_link_access,
             prefersDark=prefers_dark.value if prefers_dark else None,
             theme=theme.value if theme else None,
@@ -216,6 +220,7 @@ class OmniDashboardEmbedder:
             url.customTheme,
             url.entity,
             url.filterSearchParam,
+            url.groups,
             url.linkAccess,
             url.prefersDark,
             url.theme,
