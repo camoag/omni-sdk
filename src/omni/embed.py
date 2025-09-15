@@ -20,9 +20,12 @@ class DashboardEmbedUrl:
     externalId: str
     name: str
     nonce: str
+    accessBoost: bool | None = None
+    connectionRoles: str | None = None
     customTheme: str | None = None
     entity: str | None = None
     filterSearchParam: str | None = None
+    groups: str | None = None
     linkAccess: str | None = None
     prefersDark: str | None = None
     theme: str | None = None
@@ -115,9 +118,12 @@ class OmniDashboardEmbedder:
         content_path: str,
         external_id: str,
         name: str,
+        access_boost: bool | None = None,
+        connection_roles: dict | None = None,
         custom_theme: dict | None = None,
         entity: str | None = None,
         filter_search_params: str | dict | None = None,
+        groups: list[str] | None = None,
         link_access: bool | list[str] | None = None,
         prefers_dark: PrefersDark | None = None,
         theme: Theme | None = None,
@@ -131,11 +137,14 @@ class OmniDashboardEmbedder:
             external_id: Required parameter creating a unique ID. This can be any alphanumeric value.
             name: Required parameter and can contain a non-unique name for the embed user's name property.
             custom_theme: Allows you to stylize your embedded dashboard to your preferred colors.
+            access_boost: Boolean setting to enable Access Boost for the embedded dashboard.
+            connection_roles: Required. Defines the connection roles available for embed users. Restricted queriers can create new content, Viewers can only consume dashboards.
             entity: An id to reference the entity the user belongs to. Commonly is the customer name or other
                 identifying organization for this user.
             filter_search_params: Encoded string or a dict representing dashboard filter values . This can be derived
                 by copying the substring after the "?" from a dashboard URL with non-empty filter values or using the
                 `OmniFilterSet` helper class.
+            groups: An array of group names that allows you to associate the resulting embed user with existing groups on your Omni instance.
             link_access: Allows you to customize which other Omni dashboards can be linked to from the embedded dashboard.
                 If set to True, all links on the embedded dashboard are permissed and shown. Alternatively, a list of
                 dashboard IDs can be passed (i.e. ["abcd1234", "efgh5678", "ijkl9999"]) to only permiss to specific
@@ -175,9 +184,14 @@ class OmniDashboardEmbedder:
             contentPath=content_path,
             externalId=external_id,
             name=name,
-            customTheme=compact_json_dump(custom_theme) if custom_theme else None,
+            accessBoost="true" if access_boost else None,
+            connectionRoles=compact_json_dump(
+                connection_roles) if connection_roles else None,
+            customTheme=compact_json_dump(
+                custom_theme) if custom_theme else None,
             entity=entity,
             filterSearchParam=filter_search_params,
+            groups=compact_json_dump(groups) if groups else None,
             linkAccess=_link_access,
             prefersDark=prefers_dark.value if prefers_dark else None,
             theme=theme.value if theme else None,
@@ -186,6 +200,7 @@ class OmniDashboardEmbedder:
             ),
             nonce=uuid.uuid4().hex,
         )
+
         self._sign_url(url)
         return str(url)
 
@@ -200,18 +215,21 @@ class OmniDashboardEmbedder:
             url.externalId,
             url.name,
             url.nonce,
+            url.accessBoost,
+            url.connectionRoles,
             url.customTheme,
             url.entity,
             url.filterSearchParam,
+            url.groups,
             url.linkAccess,
             url.prefersDark,
             url.theme,
             url.userAttributes,
         ]
-
         blob = "\n".join([i for i in blob_items if i is not None])
         hmac_hash = hmac.new(
-            self.embed_secret.encode("utf-8"), blob.encode("utf-8"), hashlib.sha256
+            self.embed_secret.encode(
+                "utf-8"), blob.encode("utf-8"), hashlib.sha256
         ).digest()
         url.signature = base64.urlsafe_b64encode(hmac_hash).decode("utf-8")
 
@@ -329,7 +347,8 @@ class OmniFilterSet:
     def __init__(self, **filters: OmniFilterDefinition) -> None:
         for value in filters.values():
             if not isinstance(value, OmniFilterDefinition):
-                raise TypeError("Filters must be an OmniFilterDefinition object.")
+                raise TypeError(
+                    "Filters must be an OmniFilterDefinition object.")
         self._filters = filters
 
     @property
@@ -357,6 +376,7 @@ class OmniFilterSet:
         filter_search_params = {}
         for query_param, value in filter_values.items():
             omni_filter = self.filters[query_param]
-            filter_key, filter_value = omni_filter.get_filter_search_param_info(value)
+            filter_key, filter_value = omni_filter.get_filter_search_param_info(
+                value)
             filter_search_params[filter_key] = filter_value
         return filter_search_params
