@@ -1,6 +1,9 @@
 name: Pypi Publish
 
-on: tag
+on:
+  push:
+    branches:
+      - main
 
 env:
   HATCH_INDEX_AUTH: ${{ secrets.HATCH_INDEX_AUTH }}
