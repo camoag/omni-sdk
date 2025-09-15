@@ -20,7 +20,7 @@ class DashboardEmbedUrl:
     externalId: str
     name: str
     nonce: str
-    accessBoost: bool | None = None
+    accessBoost: str | None = None
     connectionRoles: str | None = None
     customTheme: str | None = None
     entity: str | None = None
