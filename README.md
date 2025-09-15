@@ -37,21 +37,21 @@ with pytest. If you would like to test any changes against a live server you can
 
 Prerequisites:
 - [Python >= 3.9](https://www.python.org/downloads/)
-- [Poetry](https://python-poetry.org/docs/#installation)
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 Install dependencies.
 ```bash
-poetry install
+uv sync
 ```
 
 Run tests.
 ```bash
-poetry run pytest
+uv run pytest
 ```
 
 Preview documentation.
 ```bash
-poetry run mkdocs serve
+uv run mkdocs serve
 ```
 
 ### Code Style
