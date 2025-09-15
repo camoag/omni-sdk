@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/camoag/omni-sdk/compare/v1.2.0...v2.0.0) (2025-09-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* Update pypi publish to run on tag, switch to uv, and black formatting ([#40](https://github.com/camoag/omni-sdk/issues/40))
+
+### Features
+
+* Update pypi publish to run on tag, switch to uv, and black formatting ([#40](https://github.com/camoag/omni-sdk/issues/40)) ([3b8a129](https://github.com/camoag/omni-sdk/commit/3b8a129ce1e08f34ae055ab2ccada7f9cc0e2cbf))
+
 ## [1.2.0](https://github.com/camoag/omni-sdk/compare/v1.1.0...v1.2.0) (2025-09-15)
 
 
