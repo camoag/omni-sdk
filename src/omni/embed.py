@@ -20,7 +20,7 @@ class DashboardEmbedUrl:
     externalId: str
     name: str
     nonce: str
-    accessBoost: bool | None = None
+    accessBoost: str | None = None
     connectionRoles: str | None = None
     customTheme: str | None = None
     entity: str | None = None
@@ -185,10 +185,10 @@ class OmniDashboardEmbedder:
             externalId=external_id,
             name=name,
             accessBoost="true" if access_boost else None,
-            connectionRoles=compact_json_dump(
-                connection_roles) if connection_roles else None,
-            customTheme=compact_json_dump(
-                custom_theme) if custom_theme else None,
+            connectionRoles=(
+                compact_json_dump(connection_roles) if connection_roles else None
+            ),
+            customTheme=compact_json_dump(custom_theme) if custom_theme else None,
             entity=entity,
             filterSearchParam=filter_search_params,
             groups=compact_json_dump(groups) if groups else None,
@@ -228,8 +228,7 @@ class OmniDashboardEmbedder:
         ]
         blob = "\n".join([i for i in blob_items if i is not None])
         hmac_hash = hmac.new(
-            self.embed_secret.encode(
-                "utf-8"), blob.encode("utf-8"), hashlib.sha256
+            self.embed_secret.encode("utf-8"), blob.encode("utf-8"), hashlib.sha256
         ).digest()
         url.signature = base64.urlsafe_b64encode(hmac_hash).decode("utf-8")
 
@@ -347,8 +346,7 @@ class OmniFilterSet:
     def __init__(self, **filters: OmniFilterDefinition) -> None:
         for value in filters.values():
             if not isinstance(value, OmniFilterDefinition):
-                raise TypeError(
-                    "Filters must be an OmniFilterDefinition object.")
+                raise TypeError("Filters must be an OmniFilterDefinition object.")
         self._filters = filters
 
     @property
@@ -376,7 +374,6 @@ class OmniFilterSet:
         filter_search_params = {}
         for query_param, value in filter_values.items():
             omni_filter = self.filters[query_param]
-            filter_key, filter_value = omni_filter.get_filter_search_param_info(
-                value)
+            filter_key, filter_value = omni_filter.get_filter_search_param_info(value)
             filter_search_params[filter_key] = filter_value
         return filter_search_params
