@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/camoag/omni-sdk/compare/v1.1.0...v1.2.0) (2025-09-15)
+
+
+### Features
+
+* Add support for connectionRoles parameter ([#36](https://github.com/camoag/omni-sdk/issues/36)) ([1405132](https://github.com/camoag/omni-sdk/commit/14051325547b761d4691c8cfb12ab83bc9aab925))
+
 ## [1.1.0](https://github.com/camoag/omni-sdk/compare/v1.0.1...v1.1.0) (2024-09-18)
 
 
