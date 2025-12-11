@@ -8,6 +8,7 @@ import urllib.parse
 import uuid
 from dataclasses import asdict, dataclass
 from enum import Enum
+from typing import Literal
 
 from .config import OmniConfig, OmniConfigError
 from .utils import compact_json_dump
@@ -23,12 +24,22 @@ class DashboardEmbedUrl:
     accessBoost: str | None = None
     connectionRoles: str | None = None
     customTheme: str | None = None
+    customThemeId: str | None = None
+    email: str | None = None
     entity: str | None = None
+    entityFolderContentRole: str | None = None
+    entityFolderGroupContentRole: str | None = None
+    entityFolderLabel: str | None = None
+    entityGroupLabel: str | None = None
     filterSearchParam: str | None = None
     groups: str | None = None
     linkAccess: str | None = None
+    mode: str | None = None
+    modelRoles: str | None = None
     prefersDark: str | None = None
+    preserveEntityFolderContentRole: str | None = None
     theme: str | None = None
+    uiSettings: str | None = None
     userAttributes: str | None = None
     signature: str | None = None
 
@@ -56,6 +67,32 @@ class OmniDashboardEmbedder:
         embed_login_url: Base url of embedded dashboard urls.
         embed_secret: Omni embed secret.
     """
+
+    class AccessMode(Enum):
+        """AccessMode options
+
+        Attributes:
+            application: APPLICATION
+            single_content: SINGLE_CONTENT
+        """
+
+        application = "APPLICATION"
+        single_content = "SINGLE_CONTENT"
+
+    class ContentRole(Enum):
+        """ContentRole options
+
+        Attributes:
+            viewer: VIEWER
+            editor: EDITOR
+            manager: MANAGER
+            no_access: NO_ACCESS
+        """
+
+        viewer = "VIEWER"
+        editor = "EDITOR"
+        manager = "MANAGER"
+        no_access = "NO_ACCESS"
 
     class PrefersDark(Enum):
         """PrefersDark options
@@ -121,42 +158,55 @@ class OmniDashboardEmbedder:
         access_boost: bool | None = None,
         connection_roles: dict | None = None,
         custom_theme: dict | None = None,
+        custom_theme_id: str | None = None,
+        email: str | None = None,
         entity: str | None = None,
+        entity_folder_content_role: ContentRole | None = None,
+        entity_folder_group_content_role: ContentRole | None = None,
+        entity_folder_label: str | None = None,
+        entity_group_label: str | None = None,
         filter_search_params: str | dict | None = None,
         groups: list[str] | None = None,
         link_access: bool | list[str] | None = None,
+        mode: AccessMode | None = None,
+        model_roles: dict | None = None,
         prefers_dark: PrefersDark | None = None,
+        preserve_entity_folder_content_role: bool | None = None,
         theme: Theme | None = None,
+        ui_settings: dict | None = None,
         user_attributes: dict | None = None,
     ) -> str:
-        """Builds a signed dashboard embedding URL. For more information on the options see the [Omni Docs](
-        https://docs.omni.co/docs/embed/private-embedding#embed-url-customization-options)
+        """
+        Builds a signed dashboard embedding URL. For more information on the options see the Omni Docs:
+        https://docs.omni.co/embed/setup/url-parameters
 
         Args:
-            content_path: Path pointing to the dashboard you wish to build a URL to embed.
-            external_id: Required parameter creating a unique ID. This can be any alphanumeric value.
-            name: Required parameter and can contain a non-unique name for the embed user's name property.
-            custom_theme: Allows you to stylize your embedded dashboard to your preferred colors.
-            access_boost: Boolean setting to enable Access Boost for the embedded dashboard.
-            connection_roles: Required. Defines the connection roles available for embed users. Restricted queriers can create new content, Viewers can only consume dashboards.
-            entity: An id to reference the entity the user belongs to. Commonly is the customer name or other
-                identifying organization for this user.
-            filter_search_params: Encoded string or a dict representing dashboard filter values . This can be derived
-                by copying the substring after the "?" from a dashboard URL with non-empty filter values or using the
-                `OmniFilterSet` helper class.
-            groups: An array of group names that allows you to associate the resulting embed user with existing groups on your Omni instance.
-            link_access: Allows you to customize which other Omni dashboards can be linked to from the embedded dashboard.
-                If set to True, all links on the embedded dashboard are permissed and shown. Alternatively, a list of
-                dashboard IDs can be passed (i.e. ["abcd1234", "efgh5678", "ijkl9999"]) to only permiss to specific
-                dashboard IDs. Finally, if the parameter is None, all links to other Omni dashboards are
-                restricted. Note that link URLs to anything other than an Omni Dashboard will be shown and permissed
-                regardless of the linkAccess parameter.
-            prefers_dark: Dark mode setting.
-            theme: Visual theming options.
-            user_attributes: Dictionary of attributes matching defined user attributes in your Omni account.
+            access_boost (bool, optional): Enables AccessBoost for the embedded dashboard.
+            connection_roles (dict, optional): Level of access for all models in a connection.
+            content_path (str): Path pointing to the dashboard you wish to embed.
+            custom_theme (dict, optional): Custom theme properties for styling embedded dashboards.
+            custom_theme_id (str, optional): Theme ID from your Omni instance to stylize embedded dashboards.
+            email (str, optional): Email for entity users when sharing content or sending deliveries.
+            entity (str, optional): User group identifier to associate the embed user with a larger group.
+            entity_folder_content_role (str, optional): Content role for the embed user's shared entity folder.
+            entity_folder_group_content_role (str, optional): Content role for the embed entity group shared folder.
+            entity_folder_label (str, optional): Label for the embed user's associated entity folder.
+            entity_group_label (str, optional): Label for the embed user's associated entity group.
+            external_id (str): Unique ID for the embed user.
+            filter_search_params (str | dict, optional): Filters to apply for the embedded content.
+            groups (list[str], optional): Associate embed user with existing user groups in your Omni instance.
+            link_access (bool | list[str], optional): Controls which Omni dashboards can be linked to from the embedded dashboard.
+            mode (AccessMode, optional): Type of access users will have to Omni in the iframe.
+            model_roles (dict, optional): Level of access for individual models in a connection.
+            name (str): Name for the embed user's name property.
+            prefers_dark (PrefersDark, optional): Light or dark mode appearance.
+            preserve_entity_folder_content_role (bool, optional): Retains the embed user's existing entity folder content role.
+            theme (Theme, optional): Built-in Omni application theme.
+            ui_settings (dict, optional): General settings of the application in embed.
+            user_attributes (dict, optional): User attributes to apply to the embed user.
 
         Returns:
-            : Signed dashboard embedding URL.
+            str: Signed dashboard embedding URL.
         """
 
         # Preprocess some values before passing to URL object.
@@ -173,7 +223,6 @@ class OmniDashboardEmbedder:
 
         # Convert empty dicts and strings to None.
         filter_search_params = filter_search_params or None
-
         if isinstance(filter_search_params, dict):
             filter_search_params = urllib.parse.urlencode(
                 filter_search_params, doseq=True
@@ -189,12 +238,30 @@ class OmniDashboardEmbedder:
                 compact_json_dump(connection_roles) if connection_roles else None
             ),
             customTheme=compact_json_dump(custom_theme) if custom_theme else None,
+            customThemeId=custom_theme_id,
+            email=email,
             entity=entity,
+            entityFolderContentRole=(
+                entity_folder_content_role.value if entity_folder_content_role else None
+            ),
+            entityFolderGroupContentRole=(
+                entity_folder_group_content_role.value
+                if entity_folder_group_content_role
+                else None
+            ),
+            entityFolderLabel=entity_folder_label,
+            entityGroupLabel=entity_group_label,
             filterSearchParam=filter_search_params,
             groups=compact_json_dump(groups) if groups else None,
             linkAccess=_link_access,
+            mode=mode.value if mode else None,
+            modelRoles=compact_json_dump(model_roles) if model_roles else None,
             prefersDark=prefers_dark.value if prefers_dark else None,
+            preserveEntityFolderContentRole=(
+                "true" if preserve_entity_folder_content_role else None
+            ),
             theme=theme.value if theme else None,
+            uiSettings=compact_json_dump(ui_settings) if ui_settings else None,
             userAttributes=(
                 compact_json_dump(user_attributes) if user_attributes else None
             ),
@@ -208,7 +275,8 @@ class OmniDashboardEmbedder:
         """Creates a signature and adds it to the URL object."""
 
         # IMPORTANT: These must be in the correct order as documented here
-        # https://docs.omni.co/docs/embed/private-embedding#manually-generate-a-signature-and-url-hard-mode
+        # https://docs.omni.co/embed/setup/standard-sso#manual-generation
+
         blob_items = [
             url.base_url,
             url.contentPath,
@@ -218,12 +286,22 @@ class OmniDashboardEmbedder:
             url.accessBoost,
             url.connectionRoles,
             url.customTheme,
+            url.customThemeId,
+            url.email,
             url.entity,
+            url.entityFolderContentRole,
+            url.entityFolderGroupContentRole,
+            url.entityFolderLabel,
+            url.entityGroupLabel,
             url.filterSearchParam,
             url.groups,
             url.linkAccess,
+            url.mode,
+            url.modelRoles,
             url.prefersDark,
+            url.preserveEntityFolderContentRole,
             url.theme,
+            url.uiSettings,
             url.userAttributes,
         ]
         blob = "\n".join([i for i in blob_items if i is not None])
