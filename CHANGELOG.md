@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/camoag/omni-sdk/compare/v2.0.0...v2.1.0) (2025-12-11)
+
+
+### Features
+
+* Add additional optional embed URL params ([#42](https://github.com/camoag/omni-sdk/issues/42)) ([431efc2](https://github.com/camoag/omni-sdk/commit/431efc25165ff4df164595ebe7c23efcb0af258b))
+
 ## [2.0.0](https://github.com/camoag/omni-sdk/compare/v1.2.0...v2.0.0) (2025-09-15)
 
 
