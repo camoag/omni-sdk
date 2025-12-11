@@ -1,5 +1,5 @@
 The SDK provides a convenience class for generating the url to embed dashboards in external pages and signing it.
-For more information on the options see the [Omni Docs](https://docs.omni.co/docs/embed/private-embedding#embed-url-customization-options).
+For more information on the options see the [Omni Docs](https://docs.omni.co/embed/setup/url-parameters).
 
 ## Creating the embedder
 Configuration of the client can be handled using kwargs or environment variables. There is also the option to create
@@ -67,7 +67,7 @@ url = embedder.build_url(
 The OmniDashboardEmbedder can be instantiated using either the `organization_name` or `vanity_domain` kwargs.
 Instantiating with `organization_name` uses the standard Omni endpoint for the embedded dashboard URL. Alternatively,
 Omni supports configuring a vanity domain to host embedded dashboards. You can learn about its advantages and setup
-instructions [here](https://docs.omni.co/docs/embed/private-embedding#use-a-vanity-domain). Once your vanity domain is
+instructions [here](https://docs.omni.co/embed/customization/vanity-domains). Once your vanity domain is
 set up, you can instantiate the OmniDashboardEmbedder with it to generate the correct URLs.
 
 ## Generating Filter Search Params
