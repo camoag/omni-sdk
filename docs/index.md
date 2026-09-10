@@ -10,9 +10,9 @@
 
 `pip install omni-analytics-sdk`
 
-#### poetry
+#### uv
 
-`poetry add omni-analytics-sdk`
+`uv add omni-analytics-sdk`
 
 ### Configuration
 
