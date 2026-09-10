@@ -62,6 +62,59 @@ url = embedder.build_url(
 )
 ```
 
+## Signing Formats
+
+Omni signs embed URLs using one of two formats:
+
+- **v1** (default) - All parameters are carried as JSON inside a single signed `payload` query parameter.
+- **v0** (legacy) - Each parameter is sent as its own query parameter. Omni will stop supporting this format after
+  October 1, 2026 and remove it by January 1, 2027.
+
+See the [Omni migration guide](https://docs.omni.co/embed/setup/standard-sso/migrate-to-latest) for details on what
+changed between the two.
+
+```python title="v1 (default)"
+url = embedder.build_url(
+    content_path="/dashboards/da24491e",
+    external_id="1",
+    name="Somebody",
+)
+# https://acme.embed-omniapp.co/embed/login?payload=<payload>&signature=<signature>
+```
+
+```python title="v0 (legacy)"
+url = embedder.build_url(
+    content_path="/dashboards/da24491e",
+    external_id="1",
+    name="Somebody",
+    signing_version="v0",
+)
+# https://acme.embed-omniapp.co/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&...&signature=<signature>
+```
+
+### URL Expiry
+
+Every v1 payload carries an `exp` value - the absolute moment the URL stops being valid. It defaults to 24 hours from
+the time the URL is generated. Use the `expires_in` kwarg to set a different lifetime in seconds, up to a maximum of 7
+days (604800 seconds).
+
+```python
+url = embedder.build_url(
+    content_path="/dashboards/da24491e",
+    external_id="1",
+    name="Somebody",
+    expires_in=3600,  # Valid for one hour.
+)
+```
+
+Shorter expiries are better. Until an embed URL is redeemed it is a bearer credential - anyone who has it can start
+the session it describes - and URLs leak through browser history, referer headers, screenshots, and proxy logs.
+Generate URLs on demand where you can, and only use a longer lifetime when needed, such as a URL that is emailed or
+built by a nightly job.
+
+The `expires_in` kwarg is accepted and ignored when `signing_version="v0"`, since v0 URLs have nowhere to carry an
+expiry.
+
 ## Organization Name vs. Vanity Domain
 
 The OmniDashboardEmbedder can be instantiated using either the `organization_name` or `vanity_domain` kwargs.

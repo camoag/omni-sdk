@@ -4,14 +4,27 @@ import base64
 import hashlib
 import hmac
 import json
+import time
 import urllib.parse
 import uuid
+import zlib
 from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Literal
+from typing import Any, Literal
 
 from .config import OmniConfig, OmniConfigError
 from .utils import compact_json_dump
+
+SigningVersion = Literal["v0", "v1"]
+
+#: Default lifetime, in seconds, of a v1 signed URL.
+DEFAULT_EXPIRES_IN = 24 * 60 * 60
+
+#: Maximum lifetime, in seconds, Omni accepts for a v1 signed URL.
+MAX_EXPIRES_IN = 7 * 24 * 60 * 60
+
+#: Maximum size, in bytes, of the encoded v1 payload string.
+MAX_PAYLOAD_SIZE = 64 * 1024
 
 
 @dataclass
@@ -155,6 +168,7 @@ class OmniDashboardEmbedder:
         content_path: str,
         external_id: str,
         name: str,
+        *,
         access_boost: bool | None = None,
         connection_roles: dict | None = None,
         custom_theme: dict | None = None,
@@ -165,6 +179,7 @@ class OmniDashboardEmbedder:
         entity_folder_group_content_role: ContentRole | None = None,
         entity_folder_label: str | None = None,
         entity_group_label: str | None = None,
+        expires_in: int | None = None,
         filter_search_params: str | dict | None = None,
         groups: list[str] | None = None,
         link_access: bool | list[str] | None = None,
@@ -172,6 +187,7 @@ class OmniDashboardEmbedder:
         model_roles: dict | None = None,
         prefers_dark: PrefersDark | None = None,
         preserve_entity_folder_content_role: bool | None = None,
+        signing_version: SigningVersion = "v1",
         theme: Theme | None = None,
         ui_settings: dict | None = None,
         user_attributes: dict | None = None,
@@ -192,6 +208,9 @@ class OmniDashboardEmbedder:
             entity_folder_group_content_role (str, optional): Content role for the embed entity group shared folder.
             entity_folder_label (str, optional): Label for the embed user's associated entity folder.
             entity_group_label (str, optional): Label for the embed user's associated entity group.
+            expires_in (int, optional): Lifetime of the URL in seconds. Must be positive and no more than 7 days
+                (604800 seconds). Defaults to 24 hours. Only used by the v1 signing format; ignored for v0, which
+                has nowhere to carry an expiry.
             external_id (str): Unique ID for the embed user.
             filter_search_params (str | dict, optional): Filters to apply for the embedded content.
             groups (list[str], optional): Associate embed user with existing user groups in your Omni instance.
@@ -201,13 +220,21 @@ class OmniDashboardEmbedder:
             name (str): Name for the embed user's name property.
             prefers_dark (PrefersDark, optional): Light or dark mode appearance.
             preserve_entity_folder_content_role (bool, optional): Retains the embed user's existing entity folder content role.
+            signing_version (str, optional): Signing format to use - "v1" (default) or "v0" (legacy). The v0 format is
+                unsupported by Omni after October 1, 2026 and removed by January 1, 2027.
             theme (Theme, optional): Built-in Omni application theme.
             ui_settings (dict, optional): General settings of the application in embed.
             user_attributes (dict, optional): User attributes to apply to the embed user.
 
         Returns:
             str: Signed dashboard embedding URL.
+
+        Raises:
+            ValueError: If an argument is invalid or the generated v1 payload is too large.
         """
+
+        if signing_version not in ("v0", "v1"):
+            raise ValueError('signing_version must be either "v1" or "v0".')
 
         # Preprocess some values before passing to URL object.
         if link_access is True:
@@ -227,6 +254,50 @@ class OmniDashboardEmbedder:
             filter_search_params = urllib.parse.urlencode(
                 filter_search_params, doseq=True
             )
+
+        nonce = uuid.uuid4().hex
+
+        if signing_version == "v1":
+            # In v1 the parameters are carried as real JSON inside a single signed payload, so JSON-valued
+            # parameters are passed through as objects and arrays rather than pre-stringified strings.
+            v1_params: dict[str, Any] = {
+                "loginUrl": self.embed_login_url,
+                "contentPath": content_path,
+                "externalId": external_id,
+                "name": name,
+                "nonce": nonce,
+                "accessBoost": True if access_boost else None,
+                "connectionRoles": connection_roles or None,
+                "customTheme": custom_theme or None,
+                "customThemeId": custom_theme_id,
+                "email": email,
+                "entity": entity,
+                "entityFolderContentRole": (
+                    entity_folder_content_role.value
+                    if entity_folder_content_role
+                    else None
+                ),
+                "entityFolderGroupContentRole": (
+                    entity_folder_group_content_role.value
+                    if entity_folder_group_content_role
+                    else None
+                ),
+                "entityFolderLabel": entity_folder_label,
+                "entityGroupLabel": entity_group_label,
+                "filterSearchParam": filter_search_params,
+                "groups": groups or None,
+                "linkAccess": _link_access,
+                "mode": mode.value if mode else None,
+                "modelRoles": model_roles or None,
+                "prefersDark": prefers_dark.value if prefers_dark else None,
+                "preserveEntityFolderContentRole": (
+                    True if preserve_entity_folder_content_role else None
+                ),
+                "theme": theme.value if theme else None,
+                "uiSettings": ui_settings or None,
+                "userAttributes": user_attributes or None,
+            }
+            return self._build_v1_url(v1_params, expires_in)
 
         url = DashboardEmbedUrl(
             base_url=self.embed_login_url,
@@ -265,17 +336,59 @@ class OmniDashboardEmbedder:
             userAttributes=(
                 compact_json_dump(user_attributes) if user_attributes else None
             ),
-            nonce=uuid.uuid4().hex,
+            nonce=nonce,
         )
 
         self._sign_url(url)
         return str(url)
 
+    def _build_v1_url(self, params: dict[str, Any], expires_in: int | None) -> str:
+        """Builds and signs a URL using the v1 signed payload format as documented here
+        https://docs.omni.co/embed/setup/standard-sso/latest#manual-generation
+        """
+
+        if expires_in is None:
+            expires_in = DEFAULT_EXPIRES_IN
+        if expires_in <= 0 or expires_in > MAX_EXPIRES_IN:
+            raise ValueError(
+                f"expires_in must be a positive number of seconds no greater than {MAX_EXPIRES_IN} (7 days)."
+            )
+
+        payload_params = {
+            key: value for key, value in params.items() if value is not None
+        }
+
+        # Absolute expiry in epoch seconds, following the JWT convention.
+        payload_params["exp"] = int(time.time()) + expires_in
+
+        # Raw DEFLATE (RFC 1951): a negative wbits omits the zlib wrapper.
+        compressor = zlib.compressobj(9, zlib.DEFLATED, -zlib.MAX_WBITS)
+        compressed = compressor.compress(
+            json.dumps(payload_params, separators=(",", ":")).encode("utf-8")
+        )
+        compressed += compressor.flush()
+        payload = base64.urlsafe_b64encode(compressed).decode("ascii")
+
+        if len(payload) > MAX_PAYLOAD_SIZE:
+            raise ValueError(
+                f"The encoded payload is larger than the {MAX_PAYLOAD_SIZE} byte limit. This usually means a "
+                "parameter, most often user_attributes, is carrying more than it should."
+            )
+
+        # The signature covers the base64url payload string itself, not the compressed bytes.
+        hmac_hash = hmac.new(
+            self.embed_secret.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256
+        ).digest()
+        signature = base64.urlsafe_b64encode(hmac_hash).decode("ascii")
+
+        query = urllib.parse.urlencode({"payload": payload, "signature": signature})
+        return f"{self.embed_login_url}?{query}"
+
     def _sign_url(self, url: DashboardEmbedUrl) -> None:
         """Creates a signature and adds it to the URL object."""
 
         # IMPORTANT: These must be in the correct order as documented here
-        # https://docs.omni.co/embed/setup/standard-sso#manual-generation
+        # https://docs.omni.co/embed/setup/standard-sso/v0-legacy#manual-generation
 
         blob_items = [
             url.base_url,
