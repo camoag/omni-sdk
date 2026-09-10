@@ -6,7 +6,7 @@ from .embed import (
     OmniFilterSet,
 )
 
-__version__ = "0.3.0-alpha"
+__version__ = "3.0.0"
 
 __all__ = [
     "OmniApiClient",
