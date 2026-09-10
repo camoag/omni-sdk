@@ -537,6 +537,10 @@ class TestContentTypeHelpers:
         )
         assert decode_payload(url)["contentPath"] == expected_path
 
+    def test_chat_content_path(self, embedder: OmniEmbedder) -> None:
+        url = embedder.build_chat_url(external_id="1", name="Somebody")
+        assert decode_payload(url)["contentPath"] == "/chat"
+
     def test_options_are_passed_through(self, embedder: OmniEmbedder) -> None:
         url = embedder.build_dashboard_url(
             content_id="da24491e",

@@ -242,6 +242,30 @@ class OmniEmbedder:
             **options,
         )
 
+    def build_chat_url(
+        self,
+        external_id: str,
+        name: str,
+        **options: Any,
+    ) -> str:
+        """Builds a signed embedding URL for chat. Chat has no content ID - it always lives at "/chat".
+
+        Args:
+            external_id: Unique ID for the embed user.
+            name: Name for the embed user's name property.
+            **options: Any of the optional keyword arguments accepted by
+                [build_url][omni.OmniEmbedder.build_url].
+
+        Returns:
+            str: Signed embedding URL.
+        """
+        return self.build_url(
+            content_path="/chat",
+            external_id=external_id,
+            name=name,
+            **options,
+        )
+
     @staticmethod
     def _content_path(prefix: str, content_id: str) -> str:
         """Builds a content path from a bare content ID, rejecting anything that looks like a full path."""

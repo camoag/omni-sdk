@@ -42,8 +42,8 @@ embedder = OmniEmbedder()
 ```
 
 ## Generating an embedding URL.
-The embedder has a method for each type of content you can embed. Each one takes the content ID and signs the URL
-it builds. For more information on the options available please see the
+The embedder has a method for each type of content you can embed. Each one takes the content ID, where the
+content type has one, and signs the URL it builds. For more information on the options available please see the
 [API Documentation](../api/OmniEmbedder.md) for the class.
 
 ```python title="Dashboard"
@@ -70,7 +70,15 @@ url = embedder.build_app_url(
 )
 ```
 
-All three accept the same optional keyword arguments, which are documented on
+```python title="Chat"
+# Chat has no content ID - it always lives at "/chat".
+url = embedder.build_chat_url(
+    external_id="1",
+    name="Somebody",
+)
+```
+
+They all accept the same optional keyword arguments, which are documented on
 [build_url](../api/OmniEmbedder.md#omni.OmniEmbedder.build_url). `build_url` is also available
 directly if you need to embed a content path these helpers do not cover - pass the full path, e.g.
 `content_path="/dashboards/da24491e"`.
