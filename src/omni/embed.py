@@ -7,6 +7,7 @@ import json
 import time
 import urllib.parse
 import uuid
+import warnings
 import zlib
 from dataclasses import asdict, dataclass
 from enum import Enum
@@ -28,7 +29,7 @@ MAX_PAYLOAD_SIZE = 64 * 1024
 
 
 @dataclass
-class DashboardEmbedUrl:
+class EmbedUrl:
     base_url: str
     contentPath: str
     externalId: str
@@ -66,8 +67,8 @@ class DashboardEmbedUrl:
         return f"{self.base_url}?{urllib.parse.urlencode(params)}"
 
 
-class OmniDashboardEmbedder:
-    """Factory class for building and signing dashboard embedding URLs.
+class OmniEmbedder:
+    """Factory class for building and signing embedding URLs.
 
     Args:
         organization_name: organization_name: Omni organization name. OMNI_ORGANIZATION_NAME environment variable will
@@ -77,7 +78,7 @@ class OmniDashboardEmbedder:
             environment variable will be used as a fallback.
 
     Attributes:
-        embed_login_url: Base url of embedded dashboard urls.
+        embed_login_url: Base url of embedding urls.
         embed_secret: Omni embed secret.
     """
 
@@ -162,6 +163,94 @@ class OmniDashboardEmbedder:
         assert omni_config.embed_secret
 
         self.embed_secret = omni_config.embed_secret
+
+    def build_dashboard_url(
+        self,
+        content_id: str,
+        external_id: str,
+        name: str,
+        **options: Any,
+    ) -> str:
+        """Builds a signed embedding URL for a dashboard.
+
+        Args:
+            content_id: ID of the dashboard to embed, e.g. "da24491e".
+            external_id: Unique ID for the embed user.
+            name: Name for the embed user's name property.
+            **options: Any of the optional keyword arguments accepted by
+                [build_url][omni.OmniEmbedder.build_url].
+
+        Returns:
+            str: Signed embedding URL.
+        """
+        return self.build_url(
+            content_path=self._content_path("dashboards", content_id),
+            external_id=external_id,
+            name=name,
+            **options,
+        )
+
+    def build_workbook_url(
+        self,
+        content_id: str,
+        external_id: str,
+        name: str,
+        **options: Any,
+    ) -> str:
+        """Builds a signed embedding URL for a workbook.
+
+        Args:
+            content_id: ID of the workbook to embed, e.g. "da24491e".
+            external_id: Unique ID for the embed user.
+            name: Name for the embed user's name property.
+            **options: Any of the optional keyword arguments accepted by
+                [build_url][omni.OmniEmbedder.build_url].
+
+        Returns:
+            str: Signed embedding URL.
+        """
+        return self.build_url(
+            content_path=self._content_path("w", content_id),
+            external_id=external_id,
+            name=name,
+            **options,
+        )
+
+    def build_app_url(
+        self,
+        content_id: str,
+        external_id: str,
+        name: str,
+        **options: Any,
+    ) -> str:
+        """Builds a signed embedding URL for an app.
+
+        Args:
+            content_id: ID of the app to embed, e.g. "da24491e".
+            external_id: Unique ID for the embed user.
+            name: Name for the embed user's name property.
+            **options: Any of the optional keyword arguments accepted by
+                [build_url][omni.OmniEmbedder.build_url].
+
+        Returns:
+            str: Signed embedding URL.
+        """
+        return self.build_url(
+            content_path=self._content_path("apps", content_id),
+            external_id=external_id,
+            name=name,
+            **options,
+        )
+
+    @staticmethod
+    def _content_path(prefix: str, content_id: str) -> str:
+        """Builds a content path from a bare content ID, rejecting anything that looks like a full path."""
+        if not content_id or "/" in content_id:
+            raise ValueError(
+                "content_id must be a bare content ID, e.g. 'da24491e'. Pass a full content path to "
+                "build_url instead."
+            )
+        return f"/{prefix}/{content_id}"
 
     def build_url(
         self,
@@ -299,7 +388,7 @@ class OmniDashboardEmbedder:
             }
             return self._build_v1_url(v1_params, expires_in)
 
-        url = DashboardEmbedUrl(
+        url = EmbedUrl(
             base_url=self.embed_login_url,
             contentPath=content_path,
             externalId=external_id,
@@ -384,7 +473,7 @@ class OmniDashboardEmbedder:
         query = urllib.parse.urlencode({"payload": payload, "signature": signature})
         return f"{self.embed_login_url}?{query}"
 
-    def _sign_url(self, url: DashboardEmbedUrl) -> None:
+    def _sign_url(self, url: EmbedUrl) -> None:
         """Creates a signature and adds it to the URL object."""
 
         # IMPORTANT: These must be in the correct order as documented here
@@ -422,6 +511,22 @@ class OmniDashboardEmbedder:
             self.embed_secret.encode("utf-8"), blob.encode("utf-8"), hashlib.sha256
         ).digest()
         url.signature = base64.urlsafe_b64encode(hmac_hash).decode("utf-8")
+
+
+class OmniDashboardEmbedder(OmniEmbedder):
+    """Deprecated alias for [OmniEmbedder][omni.OmniEmbedder].
+
+    The class was renamed when it grew methods for embedding workbooks and apps alongside dashboards. This alias
+    will be removed in a future release.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        warnings.warn(
+            "OmniDashboardEmbedder has been renamed to OmniEmbedder and will be removed in a future release.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
 
 @dataclass
@@ -525,7 +630,7 @@ class OmniFilterDefinition:
 class OmniFilterSet:
     """Helper class for generating a set of filter search parameters for an embedded dashboard. This class is designed
     to abstract the complexity of the Omni filters and create a simple interface for generating the filter values to
-    be used by the OmniDashboardEmbedder.
+    be used by the OmniEmbedder.
 
     Args:
         **filters: Arbitrary kwargs defining filter definitions. The kwarg is the name of the filter and defines the
@@ -552,7 +657,7 @@ class OmniFilterSet:
         self, filter_values: dict[str, str | int | float]
     ) -> dict[str, list[str]]:
         """Given a dictionary of filter keys and values this function returns the dictionary of expected to populate
-        the filter_search_params kwarg when calling OmniDashboardEmbedder.build_url. This method is ideal for
+        the filter_search_params kwarg when calling OmniEmbedder.build_url. This method is ideal for
         translating query params in the encapsulating application to Omni filter search parameters.
 
         Args:
@@ -560,7 +665,7 @@ class OmniFilterSet:
                 list of available filters can be found in the `filters` property.
 
         Returns:
-            : Dict to be passed as the `filter_search_params` kwarg in the `OmniDashboardEmbedder.build_url` method.
+            : Dict to be passed as the `filter_search_params` kwarg in the `OmniEmbedder.build_url` method.
         """
         filter_search_params = {}
         for query_param, value in filter_values.items():

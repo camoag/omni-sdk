@@ -27,7 +27,7 @@ The following environment variables can be set to automatically configure classe
 
 ### Usage
 
-Visit the [Dashboard Embedding](usage/dashboard_embedding.md) or [REST API Client](usage/api_client.md) pages for
+Visit the [Embedding](usage/embedding.md) or [REST API Client](usage/api_client.md) pages for
 usage information.
 
 

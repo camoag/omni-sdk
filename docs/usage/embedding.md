@@ -1,4 +1,5 @@
-The SDK provides a convenience class for generating the url to embed dashboards in external pages and signing it.
+The SDK provides a convenience class for generating the url to embed dashboards, workbooks and apps in external
+pages and signing it.
 For more information on the options see the [Omni Docs](https://docs.omni.co/embed/setup/url-parameters).
 
 ## Creating the embedder
@@ -6,47 +7,77 @@ Configuration of the client can be handled using kwargs or environment variables
 the embedder using your organization name or a vanity domain, more info on these options is below.
 
 ```python title="Kwarg Configuration - Organization Name"
-from omni import OmniDashboardEmbedder
+from omni import OmniEmbedder
 
-embedder = OmniDashboardEmbedder(organization_name="acme", embed_secret="vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC")
+embedder = OmniEmbedder(organization_name="acme", embed_secret="vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC")
 ```
 
 ```python  title="Kwarg Configuration - Vanity Domain"
-from omni import OmniDashboardEmbedder
+from omni import OmniEmbedder
 
-embedder = OmniDashboardEmbedder(vanity_domain="acme.example.com", embed_secret="vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC")
+embedder = OmniEmbedder(vanity_domain="acme.example.com", embed_secret="vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC")
 ```
 
 
 ```python title="Environment Variable Configuration - Organization Name"
 import os
-from omni import OmniDashboardEmbedder
+from omni import OmniEmbedder
 
 # For demonstration purposes only. The assumption is that these env vars are already set.
 os.environ["OMNI_ORGANIZATION_NAME"] = "acme"
 os.environ["OMNI_EMBED_SECRET"] = "vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC"
 
-embedder = OmniDashboardEmbedder()
+embedder = OmniEmbedder()
 ```
 
 ```python title="Environment Variable Configuration - Vanity Domain"
 import os
-from omni import OmniDashboardEmbedder
+from omni import OmniEmbedder
 
 # For demonstration purposes only. The assumption is that these env vars are already set.
 os.environ["OMNI_VANITY_DOMAIN"] = "acme.example.com"
 os.environ["OMNI_EMBED_SECRET"] = "vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC"
 
-embedder = OmniDashboardEmbedder()
+embedder = OmniEmbedder()
 ```
 
-## Generating a dashboard embedding URL.
-The embedder object has a single method that generates an embedding url and signs it. For more information on the
-options available please see the [API Documentation](../api/OmniDashboardEmbedder.md#omni.OmniDashboardEmbedder.build_url) for the class.
+## Generating an embedding URL.
+The embedder has a method for each type of content you can embed. Each one takes the content ID and signs the URL
+it builds. For more information on the options available please see the
+[API Documentation](../api/OmniEmbedder.md) for the class.
+
+```python title="Dashboard"
+url = embedder.build_dashboard_url(
+    content_id="da24491e",
+    external_id="1",
+    name="Somebody",
+)
+```
+
+```python title="Workbook"
+url = embedder.build_workbook_url(
+    content_id="da24491e",
+    external_id="1",
+    name="Somebody",
+)
+```
+
+```python title="App"
+url = embedder.build_app_url(
+    content_id="da24491e",
+    external_id="1",
+    name="Somebody",
+)
+```
+
+All three accept the same optional keyword arguments, which are documented on
+[build_url](../api/OmniEmbedder.md#omni.OmniEmbedder.build_url). `build_url` is also available
+directly if you need to embed a content path these helpers do not cover - pass the full path, e.g.
+`content_path="/dashboards/da24491e"`.
 
 ```python
-url = embedder.build_url(
-    content_path="/dashboards/da24491e",
+url = embedder.build_dashboard_url(
+    content_id="da24491e",
     external_id="1",
     name="Somebody",
     custom_theme={
@@ -56,8 +87,8 @@ url = embedder.build_url(
     entity="Acme",
     link_access=True,
     filter_search_params='f--object.id=%7B"is_inclusive"%3Afalse%2C"is_negative"%3Afalse%2C"kind"%3A"EQUALS"%2C"type"%3A"number"%2C"values"%3A%5B"1"%5D%7D'
-    prefers_dark=OmniDashboardEmbedder.PrefersDark.yes,
-    theme=OmniDashboardEmbedder.Theme.dawn,
+    prefers_dark=OmniEmbedder.PrefersDark.yes,
+    theme=OmniEmbedder.Theme.dawn,
     user_attributes={"country": "USA"},
 )
 ```
@@ -74,8 +105,8 @@ See the [Omni migration guide](https://docs.omni.co/embed/setup/standard-sso/mig
 changed between the two.
 
 ```python title="v1 (default)"
-url = embedder.build_url(
-    content_path="/dashboards/da24491e",
+url = embedder.build_dashboard_url(
+    content_id="da24491e",
     external_id="1",
     name="Somebody",
 )
@@ -83,8 +114,8 @@ url = embedder.build_url(
 ```
 
 ```python title="v0 (legacy)"
-url = embedder.build_url(
-    content_path="/dashboards/da24491e",
+url = embedder.build_dashboard_url(
+    content_id="da24491e",
     external_id="1",
     name="Somebody",
     signing_version="v0",
@@ -99,8 +130,8 @@ the time the URL is generated. Use the `expires_in` kwarg to set a different lif
 days (604800 seconds).
 
 ```python
-url = embedder.build_url(
-    content_path="/dashboards/da24491e",
+url = embedder.build_dashboard_url(
+    content_id="da24491e",
     external_id="1",
     name="Somebody",
     expires_in=3600,  # Valid for one hour.
@@ -117,11 +148,11 @@ expiry.
 
 ## Organization Name vs. Vanity Domain
 
-The OmniDashboardEmbedder can be instantiated using either the `organization_name` or `vanity_domain` kwargs.
+The OmniEmbedder can be instantiated using either the `organization_name` or `vanity_domain` kwargs.
 Instantiating with `organization_name` uses the standard Omni endpoint for the embedded dashboard URL. Alternatively,
 Omni supports configuring a vanity domain to host embedded dashboards. You can learn about its advantages and setup
 instructions [here](https://docs.omni.co/embed/customization/vanity-domains). Once your vanity domain is
-set up, you can instantiate the OmniDashboardEmbedder with it to generate the correct URLs.
+set up, you can instantiate the OmniEmbedder with it to generate the correct URLs.
 
 ## Generating Filter Search Params
 
@@ -146,7 +177,7 @@ allows you to pass the Flask `requests.args` directly.
 ```python title="myapp/views.py"
 from myapp import app
 from flask import request
-from omni import OmniDashboardEmbedder, OmniFilterSet, OmniFilterDefinition
+from omni import OmniEmbedder, OmniFilterSet, OmniFilterDefinition
 
 
 @app.route("/omni_dashboard_url/")
@@ -171,9 +202,9 @@ def get_omni_dashboard_url():
     # request.args == {"latitude": 33.555, "longitude": -117.602, "distance": 10}
     filter_search_params = filter_set.get_filter_search_params(request.args)
 
-    embedder = OmniDashboardEmbedder(organization_name="acme", embed_secret="vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC")
-    url = embedder.build_url(
-        content_path="/dashboards/da24491e",
+    embedder = OmniEmbedder(organization_name="acme", embed_secret="vglUd1WblfyBSdBSMPj0KrxZcNUEZ1CC")
+    url = embedder.build_dashboard_url(
+        content_id="da24491e",
         external_id="1",
         name="Somebody",
         filter_search_params=filter_search_params
