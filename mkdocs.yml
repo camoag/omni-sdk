@@ -53,11 +53,11 @@ extra:
 nav:
   - Getting Started: index.md
   - Usage:
-    - Dashboard Embedding: usage/dashboard_embedding.md
+    - Embedding: usage/embedding.md
     - REST API Client: usage/api_client.md
   - API Reference:
-    - Dashboard Embedding:
-      - omni.OmniDashboardEmbedder: api/OmniDashboardEmbedder.md
+    - Embedding:
+      - omni.OmniEmbedder: api/OmniEmbedder.md
       - omni.OmniFilterDefinition: api/OmniFilterDefinition.md
       - omni.OmniFilterSet: api/OmniFilterSet.md
     - API Client:

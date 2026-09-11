@@ -1,22 +1,55 @@
+import base64
+import hashlib
+import hmac
+import json
+import urllib.parse
+import zlib
 from typing import Any
 
 import pytest
 
-from omni import OmniDashboardEmbedder
+from omni import OmniEmbedder
 from omni.config import OmniConfigError
-from omni.embed import OmniFilterDefinition, OmniFilterSet
+from omni.embed import (
+    DEFAULT_EXPIRES_IN,
+    MAX_EXPIRES_IN,
+    RESERVED_PAGE_KEYS,
+    OmniFilterDefinition,
+    OmniFilterSet,
+)
+
+NOW = 1700000000
+
+
+def decode_payload(url: str, secret: str = "super_secret") -> dict[str, Any]:
+    """Verifies the signature of a v1 URL and returns the decoded payload parameters."""
+    base_url, _, query = url.partition("?")
+    params = urllib.parse.parse_qs(query, strict_parsing=True)
+    assert sorted(params) == ["payload", "signature"]
+
+    payload = params["payload"][0]
+    expected_signature = base64.urlsafe_b64encode(
+        hmac.new(
+            secret.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256
+        ).digest()
+    ).decode("ascii")
+    assert params["signature"][0] == expected_signature
+
+    # Raw DEFLATE (RFC 1951) - a negative wbits means there is no zlib wrapper.
+    decompressed = zlib.decompress(base64.urlsafe_b64decode(payload), -zlib.MAX_WBITS)
+    decoded: dict[str, Any] = json.loads(decompressed.decode("utf-8"))
+    assert decoded["loginUrl"] == base_url
+    return decoded
 
 
 @pytest.fixture
-def embedder() -> OmniDashboardEmbedder:
-    return OmniDashboardEmbedder(organization_name="acme", embed_secret="super_secret")
+def embedder() -> OmniEmbedder:
+    return OmniEmbedder(organization_name="acme", embed_secret="super_secret")
 
 
 @pytest.fixture
-def vanity_domain_embedder() -> OmniDashboardEmbedder:
-    return OmniDashboardEmbedder(
-        vanity_domain="foo.example.com", embed_secret="super_secret"
-    )
+def vanity_domain_embedder() -> OmniEmbedder:
+    return OmniEmbedder(vanity_domain="foo.example.com", embed_secret="super_secret")
 
 
 @pytest.fixture(autouse=True)
@@ -24,16 +57,22 @@ def patch_uuid(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("uuid.UUID.hex", "365f7003aa5b4f3586d9b81b4a5d9f69")
 
 
+@pytest.fixture(autouse=True)
+def patch_time(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("time.time", lambda: float(NOW))
+
+
 class TestUnit:
     def test_basic_url(
         self,
-        embedder: OmniDashboardEmbedder,
-        vanity_domain_embedder: OmniDashboardEmbedder,
+        embedder: OmniEmbedder,
+        vanity_domain_embedder: OmniEmbedder,
     ) -> None:
         url = embedder.build_url(
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
         )
         assert (
             url
@@ -44,6 +83,7 @@ class TestUnit:
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
         )
         assert (
             url
@@ -52,31 +92,32 @@ class TestUnit:
 
     def test_kitchen_sink(
         self,
-        embedder: OmniDashboardEmbedder,
-        vanity_domain_embedder: OmniDashboardEmbedder,
+        embedder: OmniEmbedder,
+        vanity_domain_embedder: OmniEmbedder,
     ) -> None:
         url = embedder.build_url(
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
             access_boost=True,
             connection_roles={"123456789": "VIEWER"},
             custom_theme={"dashboard-background": "#00FF00"},
             custom_theme_id="theme-123",
             email="user@example.com",
             entity="Acme",
-            entity_folder_content_role=OmniDashboardEmbedder.ContentRole.editor,
-            entity_folder_group_content_role=OmniDashboardEmbedder.ContentRole.viewer,
+            entity_folder_content_role=OmniEmbedder.ContentRole.editor,
+            entity_folder_group_content_role=OmniEmbedder.ContentRole.viewer,
             entity_folder_label="EntityLabel",
             entity_group_label="GroupLabel",
             filter_search_params={"state": "GA"},
             groups=["group1", "group2"],
             link_access=True,
-            mode=OmniDashboardEmbedder.AccessMode.application,
+            mode=OmniEmbedder.AccessMode.application,
             model_roles={"model": "read"},
-            prefers_dark=OmniDashboardEmbedder.PrefersDark.yes,
+            prefers_dark=OmniEmbedder.PrefersDark.yes,
             preserve_entity_folder_content_role=True,
-            theme=OmniDashboardEmbedder.Theme.dawn,
+            theme=OmniEmbedder.Theme.dawn,
             ui_settings={"showNavigation": False},
             user_attributes={"country": "USA"},
         )
@@ -111,24 +152,25 @@ class TestUnit:
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
             access_boost=True,
             connection_roles={"123456789": "VIEWER"},
             custom_theme={"dashboard-background": "#00FF00"},
             custom_theme_id="theme-123",
             email="user@example.com",
             entity="Acme",
-            entity_folder_content_role=OmniDashboardEmbedder.ContentRole.editor,
-            entity_folder_group_content_role=OmniDashboardEmbedder.ContentRole.viewer,
+            entity_folder_content_role=OmniEmbedder.ContentRole.editor,
+            entity_folder_group_content_role=OmniEmbedder.ContentRole.viewer,
             entity_folder_label="EntityLabel",
             entity_group_label="GroupLabel",
             filter_search_params={"state": "GA"},
             groups=["group1", "group2"],
             link_access=True,
-            mode=OmniDashboardEmbedder.AccessMode.application,
+            mode=OmniEmbedder.AccessMode.application,
             model_roles={"model": "read"},
-            prefers_dark=OmniDashboardEmbedder.PrefersDark.yes,
+            prefers_dark=OmniEmbedder.PrefersDark.yes,
             preserve_entity_folder_content_role=True,
-            theme=OmniDashboardEmbedder.Theme.dawn,
+            theme=OmniEmbedder.Theme.dawn,
             ui_settings={"showNavigation": False},
             user_attributes={"country": "USA"},
         )
@@ -161,13 +203,14 @@ class TestUnit:
 
     def test_link_access(
         self,
-        embedder: OmniDashboardEmbedder,
-        vanity_domain_embedder: OmniDashboardEmbedder,
+        embedder: OmniEmbedder,
+        vanity_domain_embedder: OmniEmbedder,
     ) -> None:
         url = embedder.build_url(
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
             link_access=True,
         )
         assert (
@@ -178,6 +221,7 @@ class TestUnit:
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
             link_access=["abcd1234", "efgh5678"],
         )
         assert (
@@ -189,6 +233,7 @@ class TestUnit:
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
             link_access=True,
         )
         assert (
@@ -199,6 +244,7 @@ class TestUnit:
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
             link_access=["abcd1234", "efgh5678"],
         )
         assert (
@@ -206,17 +252,19 @@ class TestUnit:
             == "https://foo.example.com/embed/login?contentPath=%2Fdashboards%2Fda24491e&externalId=1&name=Somebody&nonce=365f7003aa5b4f3586d9b81b4a5d9f69&linkAccess=abcd1234%2Cefgh5678&signature=UycR_auXAIHGVTDPahgMSt4NOUxDEVc92Y3ollHcU5Q%3D"
         )
 
-    def test_filter_search_params(self, embedder: OmniDashboardEmbedder) -> None:
+    def test_filter_search_params(self, embedder: OmniEmbedder) -> None:
         str_url = embedder.build_url(
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
             filter_search_params="state=GA&county=Fulton",
         )
         dict_url = embedder.build_url(
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
             filter_search_params={"state": "GA", "county": "Fulton"},
         )
         assert (
@@ -229,6 +277,7 @@ class TestUnit:
             content_path="/dashboards/da24491e",
             external_id="1",
             name="Somebody",
+            signing_version="v0",
             filter_search_params={},
         )
         assert (
@@ -238,21 +287,21 @@ class TestUnit:
 
     def test_missing_organization_name_or_vanity_domain(self) -> None:
         with pytest.raises(OmniConfigError):
-            OmniDashboardEmbedder(embed_secret="super_secret")
+            OmniEmbedder(embed_secret="super_secret")
 
     def test_missing_embed_secret(self) -> None:
         with pytest.raises(OmniConfigError):
-            OmniDashboardEmbedder(organization_name="acme")
+            OmniEmbedder(organization_name="acme")
 
         with pytest.raises(OmniConfigError):
-            OmniDashboardEmbedder(vanity_domain="foo.example.com")
+            OmniEmbedder(vanity_domain="foo.example.com")
 
     def test_env_configuration_with_organization(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setenv("OMNI_ORGANIZATION_NAME", "acme")
         monkeypatch.setenv("OMNI_EMBED_SECRET", "super_secret")
-        embedder = OmniDashboardEmbedder()
+        embedder = OmniEmbedder()
         assert embedder.embed_secret == "super_secret"
         assert embedder.embed_login_url == "https://acme.embed-omniapp.co/embed/login"
 
@@ -261,8 +310,337 @@ class TestUnit:
     ) -> None:
         monkeypatch.setenv("OMNI_VANITY_DOMAIN", "foo.example.com")
         monkeypatch.setenv("OMNI_EMBED_SECRET", "super_secret")
-        embedder = OmniDashboardEmbedder()
+        embedder = OmniEmbedder()
         assert embedder.embed_login_url == "https://foo.example.com/embed/login"
+
+
+class TestV1Signing:
+    def test_basic_url(
+        self,
+        embedder: OmniEmbedder,
+        vanity_domain_embedder: OmniEmbedder,
+    ) -> None:
+        url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+        )
+        assert url.startswith("https://acme.embed-omniapp.co/embed/login?payload=")
+        assert decode_payload(url) == {
+            "loginUrl": "https://acme.embed-omniapp.co/embed/login",
+            "contentPath": "/dashboards/da24491e",
+            "externalId": "1",
+            "name": "Somebody",
+            "nonce": "365f7003aa5b4f3586d9b81b4a5d9f69",
+            "exp": NOW + DEFAULT_EXPIRES_IN,
+        }
+
+        url = vanity_domain_embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+        )
+        assert decode_payload(url)["loginUrl"] == "https://foo.example.com/embed/login"
+
+    def test_v1_is_the_default(self, embedder: OmniEmbedder) -> None:
+        default_url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+        )
+        explicit_url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+            signing_version="v1",
+        )
+        assert default_url == explicit_url
+
+    def test_kitchen_sink(self, embedder: OmniEmbedder) -> None:
+        url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+            access_boost=True,
+            connection_roles={"123456789": "VIEWER"},
+            custom_theme={"dashboard-background": "#00FF00"},
+            custom_theme_id="theme-123",
+            email="user@example.com",
+            entity="Acme",
+            entity_folder_content_role=OmniEmbedder.ContentRole.editor,
+            entity_folder_group_content_role=OmniEmbedder.ContentRole.viewer,
+            entity_folder_label="EntityLabel",
+            entity_group_label="GroupLabel",
+            filter_search_params={"state": "GA"},
+            groups=["group1", "group2"],
+            link_access=True,
+            mode=OmniEmbedder.AccessMode.application,
+            model_roles={"model": "read"},
+            prefers_dark=OmniEmbedder.PrefersDark.yes,
+            preserve_entity_folder_content_role=True,
+            theme=OmniEmbedder.Theme.dawn,
+            ui_settings={"showNavigation": False},
+            user_attributes={"country": "USA"},
+        )
+
+        # JSON-valued parameters are real JSON in v1, not pre-stringified strings.
+        assert decode_payload(url) == {
+            "loginUrl": "https://acme.embed-omniapp.co/embed/login",
+            "contentPath": "/dashboards/da24491e",
+            "externalId": "1",
+            "name": "Somebody",
+            "nonce": "365f7003aa5b4f3586d9b81b4a5d9f69",
+            "exp": NOW + DEFAULT_EXPIRES_IN,
+            "accessBoost": True,
+            "connectionRoles": {"123456789": "VIEWER"},
+            "customTheme": {"dashboard-background": "#00FF00"},
+            "customThemeId": "theme-123",
+            "email": "user@example.com",
+            "entity": "Acme",
+            "entityFolderContentRole": "EDITOR",
+            "entityFolderGroupContentRole": "VIEWER",
+            "entityFolderLabel": "EntityLabel",
+            "entityGroupLabel": "GroupLabel",
+            "filterSearchParam": "state=GA",
+            "groups": ["group1", "group2"],
+            "linkAccess": "__omni_link_access_open",
+            "mode": "APPLICATION",
+            "modelRoles": {"model": "read"},
+            "prefersDark": "true",
+            "preserveEntityFolderContentRole": True,
+            "theme": "dawn",
+            "uiSettings": {"showNavigation": False},
+            "userAttributes": {"country": "USA"},
+        }
+
+    def test_link_access(self, embedder: OmniEmbedder) -> None:
+        url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+            link_access=["abcd1234", "efgh5678"],
+        )
+        assert decode_payload(url)["linkAccess"] == "abcd1234,efgh5678"
+
+    def test_filter_search_params(self, embedder: OmniEmbedder) -> None:
+        str_url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+            filter_search_params="state=GA&county=Fulton",
+        )
+        dict_url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+            filter_search_params={"state": "GA", "county": "Fulton"},
+        )
+        # filterSearchParam stays a URI-encoded query fragment, since that is what the parameter holds.
+        assert str_url == dict_url
+        assert decode_payload(str_url)["filterSearchParam"] == "state=GA&county=Fulton"
+
+    def test_empty_values_are_omitted(self, embedder: OmniEmbedder) -> None:
+        url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+            access_boost=False,
+            connection_roles={},
+            filter_search_params={},
+            groups=[],
+            user_attributes={},
+        )
+        assert set(decode_payload(url)) == {
+            "loginUrl",
+            "contentPath",
+            "externalId",
+            "name",
+            "nonce",
+            "exp",
+        }
+
+    def test_expires_in(self, embedder: OmniEmbedder) -> None:
+        url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+            expires_in=3600,
+        )
+        assert decode_payload(url)["exp"] == NOW + 3600
+
+        url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+            expires_in=MAX_EXPIRES_IN,
+        )
+        assert decode_payload(url)["exp"] == NOW + MAX_EXPIRES_IN
+
+    @pytest.mark.parametrize("expires_in", [0, -1, MAX_EXPIRES_IN + 1])
+    def test_invalid_expires_in(self, embedder: OmniEmbedder, expires_in: int) -> None:
+        with pytest.raises(ValueError, match="expires_in"):
+            embedder.build_url(
+                content_path="/dashboards/da24491e",
+                external_id="1",
+                name="Somebody",
+                expires_in=expires_in,
+            )
+
+    def test_expires_in_ignored_for_v0(self, embedder: OmniEmbedder) -> None:
+        # v0 URLs have nowhere to carry an expiry, so the value is accepted and ignored.
+        url = embedder.build_url(
+            content_path="/dashboards/da24491e",
+            external_id="1",
+            name="Somebody",
+            expires_in=-1,
+            signing_version="v0",
+        )
+        assert "exp" not in urllib.parse.parse_qs(url.partition("?")[2])
+
+    def test_invalid_signing_version(self, embedder: OmniEmbedder) -> None:
+        with pytest.raises(ValueError, match="signing_version"):
+            embedder.build_url(
+                content_path="/dashboards/da24491e",
+                external_id="1",
+                name="Somebody",
+                signing_version="v2",  # type: ignore[arg-type]
+            )
+
+    def test_payload_too_large(self, embedder: OmniEmbedder) -> None:
+        # Random-ish values so the payload can't be compressed under the size limit.
+        user_attributes = {
+            f"attr_{i}": hashlib.sha256(str(i).encode()).hexdigest()
+            for i in range(5000)
+        }
+        with pytest.raises(ValueError, match="larger than"):
+            embedder.build_url(
+                content_path="/dashboards/da24491e",
+                external_id="1",
+                name="Somebody",
+                user_attributes=user_attributes,
+            )
+
+
+class TestContentTypeHelpers:
+    @pytest.mark.parametrize(
+        "method,expected_path",
+        [
+            ("build_dashboard_url", "/dashboards/da24491e"),
+            ("build_workbook_url", "/w/da24491e"),
+            ("build_app_url", "/apps/da24491e"),
+        ],
+    )
+    def test_content_path(
+        self, embedder: OmniEmbedder, method: str, expected_path: str
+    ) -> None:
+        url = getattr(embedder, method)(
+            content_id="da24491e", external_id="1", name="Somebody"
+        )
+        assert decode_payload(url)["contentPath"] == expected_path
+
+    def test_chat_content_path(self, embedder: OmniEmbedder) -> None:
+        url = embedder.build_chat_url(external_id="1", name="Somebody")
+        assert decode_payload(url)["contentPath"] == "/chat"
+
+    def test_options_are_passed_through(self, embedder: OmniEmbedder) -> None:
+        url = embedder.build_dashboard_url(
+            content_id="da24491e",
+            external_id="1",
+            name="Somebody",
+            entity="Acme",
+            theme=OmniEmbedder.Theme.dawn,
+            expires_in=3600,
+        )
+        payload = decode_payload(url)
+        assert payload["entity"] == "Acme"
+        assert payload["theme"] == "dawn"
+        assert payload["exp"] == NOW + 3600
+
+    def test_matches_build_url(self, embedder: OmniEmbedder) -> None:
+        assert embedder.build_dashboard_url(
+            content_id="da24491e", external_id="1", name="Somebody"
+        ) == embedder.build_url(
+            content_path="/dashboards/da24491e", external_id="1", name="Somebody"
+        )
+
+    def test_v0_still_available(self, embedder: OmniEmbedder) -> None:
+        url = embedder.build_workbook_url(
+            content_id="da24491e",
+            external_id="1",
+            name="Somebody",
+            signing_version="v0",
+        )
+        params = urllib.parse.parse_qs(url.partition("?")[2], strict_parsing=True)
+        assert params["contentPath"] == ["/w/da24491e"]
+
+    def test_page_key(self, embedder: OmniEmbedder) -> None:
+        url = embedder.build_dashboard_url(
+            content_id="da24491e",
+            external_id="1",
+            name="Somebody",
+            page_key="revenue_2024-Q1",
+        )
+        assert (
+            decode_payload(url)["contentPath"] == "/dashboards/da24491e/revenue_2024-Q1"
+        )
+
+    @pytest.mark.parametrize(
+        "page_key,message",
+        [
+            ("", "must not be empty"),
+            ("drill", "reserved system values"),
+            ("Save-As", "reserved system values"),
+        ],
+    )
+    def test_invalid_page_key(
+        self, embedder: OmniEmbedder, page_key: str, message: str
+    ) -> None:
+        with pytest.raises(ValueError, match=message):
+            embedder.build_dashboard_url(
+                content_id="da24491e",
+                external_id="1",
+                name="Somebody",
+                page_key=page_key,
+            )
+
+    @pytest.mark.parametrize("page_key", sorted(RESERVED_PAGE_KEYS))
+    def test_all_reserved_page_keys_rejected(
+        self, embedder: OmniEmbedder, page_key: str
+    ) -> None:
+        with pytest.raises(ValueError, match="reserved system values"):
+            embedder.build_dashboard_url(
+                content_id="da24491e",
+                external_id="1",
+                name="Somebody",
+                page_key=page_key,
+            )
+
+    @pytest.mark.parametrize("content_id", ["", "/dashboards/da24491e", "w/da24491e"])
+    def test_content_id_must_not_be_a_path(
+        self, embedder: OmniEmbedder, content_id: str
+    ) -> None:
+        with pytest.raises(ValueError, match="bare content ID"):
+            embedder.build_dashboard_url(
+                content_id=content_id, external_id="1", name="Somebody"
+            )
+
+
+class TestDeprecatedAlias:
+    def test_alias_warns_but_works(self) -> None:
+        from omni import OmniDashboardEmbedder
+
+        with pytest.warns(DeprecationWarning, match="renamed to OmniEmbedder"):
+            embedder = OmniDashboardEmbedder(
+                organization_name="acme", embed_secret="super_secret"
+            )
+        assert isinstance(embedder, OmniEmbedder)
+        assert embedder.build_dashboard_url(
+            content_id="da24491e", external_id="1", name="Somebody"
+        ) == OmniEmbedder(
+            organization_name="acme", embed_secret="super_secret"
+        ).build_dashboard_url(
+            content_id="da24491e", external_id="1", name="Somebody"
+        )
 
 
 class TestFilters:

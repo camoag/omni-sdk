@@ -32,7 +32,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ### Development Environment
 
-The development environment is simple and straightforward. Dependencies are managed by Poetry and tests are run
+The development environment is simple and straightforward. Dependencies are managed by uv and tests are run
 with pytest. If you would like to test any changes against a live server you can use any apps in the `/examples` directory.
 
 Prerequisites:
