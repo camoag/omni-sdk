@@ -27,6 +27,29 @@ MAX_EXPIRES_IN = 7 * 24 * 60 * 60
 #: Maximum size, in bytes, of the encoded v1 payload string.
 MAX_PAYLOAD_SIZE = 64 * 1024
 
+#: Page keys Omni reserves for its own routes, so they cannot identify a dashboard page.
+#: https://docs.omni.co/visualize-present/dashboards/pages#page-key
+RESERVED_PAGE_KEYS = frozenset(
+    {
+        "chat",
+        "download",
+        "drill",
+        "edit",
+        "layout",
+        "monitor",
+        "move",
+        "performance",
+        "preview",
+        "publish",
+        "run",
+        "save-as",
+        "schedules",
+        "share",
+        "themes",
+        "transfer",
+    }
+)
+
 
 @dataclass
 class EmbedUrl:
@@ -169,6 +192,7 @@ class OmniEmbedder:
         content_id: str,
         external_id: str,
         name: str,
+        page_key: str | None = None,
         **options: Any,
     ) -> str:
         """Builds a signed embedding URL for a dashboard.
@@ -177,14 +201,24 @@ class OmniEmbedder:
             content_id: ID of the dashboard to embed, e.g. "da24491e".
             external_id: Unique ID for the embed user.
             name: Name for the embed user's name property.
+            page_key: Key of the page to open on a multi-page dashboard, e.g. "revenue". Omitting it
+                opens the dashboard's first page.
             **options: Any of the optional keyword arguments accepted by
                 [build_url][omni.OmniEmbedder.build_url].
 
         Returns:
             str: Signed embedding URL.
+
+        Raises:
+            ValueError: If page_key is empty, longer than 40 characters, contains characters other
+                than letters, numbers, hyphens and underscores, or is one of Omni's reserved system
+                values.
         """
+        content_path = self._content_path("dashboards", content_id)
+        if page_key is not None:
+            content_path = f"{content_path}/{self._validate_page_key(page_key)}"
         return self.build_url(
-            content_path=self._content_path("dashboards", content_id),
+            content_path=content_path,
             external_id=external_id,
             name=name,
             **options,
@@ -265,6 +299,18 @@ class OmniEmbedder:
             name=name,
             **options,
         )
+
+    @staticmethod
+    def _validate_page_key(page_key: str) -> str:
+        """Validates a dashboard page key against Omni's rules, returning it unchanged."""
+        if not page_key:
+            raise ValueError("page_key must not be empty.")
+        if page_key.lower() in RESERVED_PAGE_KEYS:
+            raise ValueError(
+                f"page_key '{page_key}' is one of Omni's reserved system values: "
+                f"{', '.join(sorted(RESERVED_PAGE_KEYS))}."
+            )
+        return page_key
 
     @staticmethod
     def _content_path(prefix: str, content_id: str) -> str:

@@ -78,6 +78,23 @@ url = embedder.build_chat_url(
 )
 ```
 
+Multi-page dashboards can be opened on a specific page by passing its
+[page key](https://docs.omni.co/visualize-present/dashboards/pages#page-key). Omitting it opens the
+dashboard's first page.
+
+```python title="Dashboard page"
+url = embedder.build_dashboard_url(
+    content_id="da24491e",
+    external_id="1",
+    name="Somebody",
+    page_key="revenue",
+)
+```
+
+Page keys are validated against one of Omni's reserved system values (`chat`, `download`, `drill`,
+`edit`, `layout`, `monitor`, `move`, `performance`, `preview`, `publish`, `run`, `save-as`, `schedules`, `share`,
+`themes`, `transfer`).
+
 They all accept the same optional keyword arguments, which are documented on
 [build_url](../api/OmniEmbedder.md#omni.OmniEmbedder.build_url). `build_url` is also available
 directly if you need to embed a content path these helpers do not cover - pass the full path, e.g.

@@ -13,6 +13,7 @@ from omni.config import OmniConfigError
 from omni.embed import (
     DEFAULT_EXPIRES_IN,
     MAX_EXPIRES_IN,
+    RESERVED_PAGE_KEYS,
     OmniFilterDefinition,
     OmniFilterSet,
 )
@@ -571,6 +572,48 @@ class TestContentTypeHelpers:
         )
         params = urllib.parse.parse_qs(url.partition("?")[2], strict_parsing=True)
         assert params["contentPath"] == ["/w/da24491e"]
+
+    def test_page_key(self, embedder: OmniEmbedder) -> None:
+        url = embedder.build_dashboard_url(
+            content_id="da24491e",
+            external_id="1",
+            name="Somebody",
+            page_key="revenue_2024-Q1",
+        )
+        assert (
+            decode_payload(url)["contentPath"] == "/dashboards/da24491e/revenue_2024-Q1"
+        )
+
+    @pytest.mark.parametrize(
+        "page_key,message",
+        [
+            ("", "must not be empty"),
+            ("drill", "reserved system values"),
+            ("Save-As", "reserved system values"),
+        ],
+    )
+    def test_invalid_page_key(
+        self, embedder: OmniEmbedder, page_key: str, message: str
+    ) -> None:
+        with pytest.raises(ValueError, match=message):
+            embedder.build_dashboard_url(
+                content_id="da24491e",
+                external_id="1",
+                name="Somebody",
+                page_key=page_key,
+            )
+
+    @pytest.mark.parametrize("page_key", sorted(RESERVED_PAGE_KEYS))
+    def test_all_reserved_page_keys_rejected(
+        self, embedder: OmniEmbedder, page_key: str
+    ) -> None:
+        with pytest.raises(ValueError, match="reserved system values"):
+            embedder.build_dashboard_url(
+                content_id="da24491e",
+                external_id="1",
+                name="Somebody",
+                page_key=page_key,
+            )
 
     @pytest.mark.parametrize("content_id", ["", "/dashboards/da24491e", "w/da24491e"])
     def test_content_id_must_not_be_a_path(
