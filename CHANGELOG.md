@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/camoag/omni-sdk/compare/v2.1.0...v3.0.0) (2026-09-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* Omni v1 embed signing, plus workbook and app embedding ([#45](https://github.com/camoag/omni-sdk/issues/45))
+
+### Features
+
+* Omni v1 embed signing, plus workbook and app embedding ([#45](https://github.com/camoag/omni-sdk/issues/45)) ([7d0d1af](https://github.com/camoag/omni-sdk/commit/7d0d1af8b4de3b77006a3dd286d93f6eaf223d6f))
+
 ## [2.1.0](https://github.com/camoag/omni-sdk/compare/v2.0.0...v2.1.0) (2025-12-11)
 
 
