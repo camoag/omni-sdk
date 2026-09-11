@@ -210,9 +210,7 @@ class OmniEmbedder:
             str: Signed embedding URL.
 
         Raises:
-            ValueError: If page_key is empty, longer than 40 characters, contains characters other
-                than letters, numbers, hyphens and underscores, or is one of Omni's reserved system
-                values.
+            ValueError: If page_key is empty or is one of Omni's reserved system values.
         """
         content_path = self._content_path("dashboards", content_id)
         if page_key is not None:

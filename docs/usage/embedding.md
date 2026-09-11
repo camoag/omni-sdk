@@ -111,7 +111,7 @@ url = embedder.build_dashboard_url(
     },
     entity="Acme",
     link_access=True,
-    filter_search_params='f--object.id=%7B"is_inclusive"%3Afalse%2C"is_negative"%3Afalse%2C"kind"%3A"EQUALS"%2C"type"%3A"number"%2C"values"%3A%5B"1"%5D%7D'
+    filter_search_params='f--object.id=%7B"is_inclusive"%3Afalse%2C"is_negative"%3Afalse%2C"kind"%3A"EQUALS"%2C"type"%3A"number"%2C"values"%3A%5B"1"%5D%7D',
     prefers_dark=OmniEmbedder.PrefersDark.yes,
     theme=OmniEmbedder.Theme.dawn,
     user_attributes={"country": "USA"},
